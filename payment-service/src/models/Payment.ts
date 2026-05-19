@@ -6,7 +6,7 @@ export interface IPayment {
   order_id: string;
   amount: number;
   currency: string;
-  method: 'momo' | 'zalopay' | 'payos' | 'stripe';
+  method: 'sepay' | 'momo' | 'zalopay' | 'payos' | 'stripe';
   plan: string;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   provider_transaction_id?: string;
@@ -23,7 +23,7 @@ const paymentSchema = new Schema<IPayment>({
   order_id: { type: String, required: true, unique: true },
   amount: { type: Number, required: true },
   currency: { type: String, default: 'VND' },
-  method: { type: String, required: true, enum: ['momo', 'zalopay', 'payos', 'stripe'] },
+  method: { type: String, required: true, enum: ['sepay', 'momo', 'zalopay', 'payos', 'stripe'] },
   plan: { type: String, required: true },
   status: { type: String, default: 'pending', enum: ['pending', 'completed', 'failed', 'refunded'] },
   provider_transaction_id: String,

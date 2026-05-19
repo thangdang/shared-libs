@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shared-crawler"
-version = "0.1.0"
-description = "Shared config-driven crawl engine for AI engines"
+version = "0.2.0"
+description = "Shared config-driven crawl engine with proxy pool, scheduler, translation, and dedup"
 requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.25.0",

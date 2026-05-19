@@ -9,7 +9,7 @@ import { sendOTP, verifyOTP } from '../services/otp.service';
 import { verifyGoogleToken } from '../services/google.service';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'techfuture-jwt-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET || 'winlux-jwt-secret-change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 /**

@@ -2,7 +2,7 @@
 
 Loads crawl source configurations from MongoDB and dispatches
 to the appropriate extractor. Integrates rate limiting, retry,
-deduplication, health tracking, and anti-bot measures.
+deduplication, health tracking, anti-bot measures, and proxy rotation.
 """
 
 import logging
@@ -20,6 +20,7 @@ from shared_crawler.extractors.html import HTMLExtractor
 from shared_crawler.extractors.playwright_ext import PlaywrightExtractor
 from shared_crawler.extractors.rss import RSSExtractor
 from shared_crawler.health import CrawlHealthTracker
+from shared_crawler.proxy.pool import ProxyPool, ProxyConfig
 from shared_crawler.rate_limiter import RedisRateLimiter
 from shared_crawler.retry import with_retry
 
@@ -46,12 +47,13 @@ class CrawlEngine:
     to the appropriate extractor type.
     """
 
-    def __init__(self, mongo_uri: str, redis_url: str):
+    def __init__(self, mongo_uri: str, redis_url: str, proxy_config: Optional[ProxyConfig] = None):
         """Initialize crawl engine.
 
         Args:
             mongo_uri: MongoDB connection URI.
             redis_url: Redis connection URL.
+            proxy_config: Optional proxy pool configuration.
         """
         self._mongo_client = AsyncIOMotorClient(mongo_uri)
         self._db = self._mongo_client.get_default_database()
@@ -61,6 +63,11 @@ class CrawlEngine:
         self._dedup = URLDeduplicator(redis_url)
         self._health = CrawlHealthTracker(self._db)
         self._anti_bot = AntiBotManager()
+
+        # Proxy pool (optional — only for sources that need it)
+        self._proxy_pool: Optional[ProxyPool] = None
+        if proxy_config:
+            self._proxy_pool = ProxyPool(proxy_config)
 
         # Extractor instances
         self._extractors = {
@@ -104,7 +111,7 @@ class CrawlEngine:
         """Crawl a single source by its config ID.
 
         Applies rate limiting, retry, dedup, health tracking,
-        and anti-bot measures.
+        anti-bot measures, and proxy rotation.
 
         Args:
             source_id: The source identifier in MongoDB.
@@ -126,6 +133,11 @@ class CrawlEngine:
         # Anti-bot delay
         await self._anti_bot.randomize_delay()
 
+        # Get proxy if needed
+        proxy_info = None
+        if self._proxy_pool and config.get("requires_proxy", False):
+            proxy_info = await self._proxy_pool.get_proxy(domain)
+
         try:
             # Retry on transient errors
             raw_results = await with_retry(
@@ -135,9 +147,18 @@ class CrawlEngine:
             # Record success
             await self._health.record_success(source_id)
 
+            # Report proxy success
+            if self._proxy_pool and proxy_info:
+                await self._proxy_pool.report_result(domain, True, proxy_info)
+
         except Exception as e:
             # Record failure
             await self._health.record_failure(source_id, str(e))
+
+            # Report proxy failure
+            if self._proxy_pool and proxy_info:
+                await self._proxy_pool.report_result(domain, False, proxy_info)
+
             logger.error(f"Crawl failed for source '{source_id}': {e}")
             return []
 

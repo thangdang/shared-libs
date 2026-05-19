@@ -1,12 +1,12 @@
 /**
  * Payment Microservice
  * ────────────────────
- * Shared payment service for all TechFuture products.
- * Handles: MoMo, ZaloPay, payOS, Stripe
+ * Shared payment service for all WinLux products.
+ * Handles: SePay (default), MoMo, ZaloPay, payOS, Stripe
  *
  * Port: 3006
  * Internal only — called by product services via localhost
- * Webhooks exposed via Nginx: api.techfuture.vn/payment/*
+ * Webhooks exposed via Nginx: api.winlux.com/payment/*
  */
 
 import express from 'express';
@@ -47,7 +47,7 @@ async function start() {
 
   app.listen(PORT, () => {
     console.log(`✅ Payment Service running on :${PORT}`);
-    console.log('   Providers: MoMo, ZaloPay, payOS, Stripe');
+    console.log('   Providers: SePay (default), MoMo, ZaloPay, payOS, Stripe');
   });
 }
 

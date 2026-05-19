@@ -10,10 +10,10 @@
  */
 
 const BASE_URLS: Record<string, string> = {
-  trendbriefai: 'https://trendbriefai.techfuture.vn',
-  smartbuy: 'https://smartbuy.techfuture.vn',
-  caremate: 'https://caremate.techfuture.vn',
-  fintax: 'https://fintax.techfuture.vn',
+  trendbriefai: 'https://trendbriefai.winlux.com',
+  smartbuy: 'https://smartbuy.winlux.com',
+  caremate: 'https://caremate.winlux.com',
+  fintax: 'https://fintax.winlux.com',
 };
 
 const UTM_BASE = 'utm_medium=cross_promo';

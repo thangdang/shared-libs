@@ -107,6 +107,18 @@ pip install -e ../shared-libs/shared-llm-client
 - No Ollama configuration changes required (same port 11434)
 - No MongoDB schema changes required
 
+## LLM Model per Product
+
+| Product | Default Model | Purpose |
+|---------|--------------|---------|
+| ai-video-engine | qwen2.5:7b | Vietnamese script generation, good multilingual |
+| caremate-ai | phogpt:4b-chat | Vietnamese medical explanations |
+| fin-tax-ai | mistral:7b | Financial/tax reasoning |
+| smartbuy-ai | vistral | Vietnamese product descriptions |
+| trend-brief-ai | (via shared-llm-client) | Article summarization |
+
+When using `shared-llm-client`, configure `OLLAMA_MODEL` per product in `.env`.
+
 ## Rollback
 
 To rollback any engine, simply revert the import statements:

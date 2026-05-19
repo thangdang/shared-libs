@@ -9,7 +9,7 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
 const OTP_TTL = 300; // 5 minutes
 const ESMS_API_KEY = process.env.ESMS_API_KEY || '';
 const ESMS_SECRET_KEY = process.env.ESMS_SECRET_KEY || '';
-const ESMS_BRAND_NAME = process.env.ESMS_BRAND_NAME || 'TechFuture';
+const ESMS_BRAND_NAME = process.env.ESMS_BRAND_NAME || 'WinLux';
 
 function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();

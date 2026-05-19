@@ -7,6 +7,7 @@ import { Payment } from '../models/Payment';
 import { verifyMoMoWebhook } from '../providers/momo';
 import { verifyZaloPayCallback } from '../providers/zalopay';
 import { verifyPayOSWebhook } from '../providers/payos';
+import { verifySepayWebhook, verifySepaySignature } from '../providers/sepay';
 import { verifyStripeWebhook } from '../providers/stripe';
 import axios from 'axios';
 
@@ -36,6 +37,49 @@ async function notifyProductService(payment: any): Promise<void> {
     console.error(`[Webhook] Failed to notify ${payment.product}:`, err.message);
   }
 }
+
+/**
+ * POST /api/payment/webhook/sepay — SePay IPN/Webhook callback
+ */
+router.post('/sepay', async (req: Request, res: Response) => {
+  try {
+    // Verify HMAC signature if provided
+    const signature = req.headers['x-sepay-signature'] as string;
+    if (signature && !verifySepaySignature(req.body, signature)) {
+      res.status(400).json({ success: false });
+      return;
+    }
+
+    const { valid, orderId, success, transId, amount } = verifySepayWebhook(req.body);
+    if (!valid) { res.json({ success: true }); return; } // Return 200 to avoid retries
+
+    // Try to find payment by order_id or by metadata.order_code
+    let payment = await Payment.findOne({ order_id: orderId, status: 'pending' });
+    if (!payment) {
+      payment = await Payment.findOne({ 'metadata.order_code': orderId, status: 'pending' });
+    }
+    if (!payment) {
+      // Payment code from bank transfer content
+      payment = await Payment.findOne({ order_id: { $regex: orderId }, status: 'pending' });
+    }
+    if (!payment) { res.json({ success: true }); return; }
+
+    if (success) {
+      payment.status = 'completed';
+      payment.provider_transaction_id = transId;
+      await payment.save();
+      await notifyProductService(payment);
+    } else {
+      payment.status = 'failed';
+      await payment.save();
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('[Webhook] SePay error:', error);
+    res.json({ success: true }); // Always return 200 to SePay
+  }
+});
 
 /**
  * POST /api/payment/webhook/momo — MoMo IPN callback

@@ -1,0 +1,5 @@
+{
+  "name": "performance",
+  "description": "Performance optimization — MongoDB indexes, Redis config, Nginx caching, FAISS scaling, Angular lazy loading",
+  "status": "in-progress"
+}

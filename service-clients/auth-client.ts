@@ -11,7 +11,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
 const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3007';
-const JWT_SECRET = process.env.JWT_SECRET || 'techfuture-jwt-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET || 'winlux-jwt-secret-change-me';
 
 export interface AuthUser {
   id: string;

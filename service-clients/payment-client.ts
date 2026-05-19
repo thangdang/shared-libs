@@ -12,7 +12,7 @@ export interface CreatePaymentInput {
   product: string;
   userId: string;
   plan: string;
-  method: 'momo' | 'zalopay' | 'payos' | 'stripe';
+  method: 'sepay' | 'momo' | 'zalopay' | 'payos' | 'stripe';
   amount: number;
   description?: string;
   email?: string;

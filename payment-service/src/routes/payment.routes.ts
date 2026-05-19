@@ -8,6 +8,7 @@ import { Payment } from '../models/Payment';
 import { createMoMoPayment } from '../providers/momo';
 import { createZaloPayPayment } from '../providers/zalopay';
 import { createPayOSPayment } from '../providers/payos';
+import { createSepayPayment } from '../providers/sepay';
 import { createStripeCheckout } from '../providers/stripe';
 
 const router = Router();
@@ -34,6 +35,12 @@ router.post('/create', async (req: Request, res: Response) => {
     let paymentResult: any = {};
 
     switch (method) {
+      case 'sepay':
+        const sepayResult = await createSepayPayment(orderId, amount, description || `${product} - ${plan}`);
+        paymentResult = { payUrl: sepayResult.checkoutUrl, qrCode: sepayResult.qrCode };
+        paymentResult.metadata = { order_code: sepayResult.orderCode };
+        break;
+
       case 'momo':
         paymentResult = await createMoMoPayment(orderId, amount, description || `${product} - ${plan}`);
         break;
@@ -59,7 +66,7 @@ router.post('/create', async (req: Request, res: Response) => {
         break;
 
       default:
-        res.status(400).json({ error: `Invalid method: ${method}. Use: momo, zalopay, payos, stripe` });
+        res.status(400).json({ error: `Invalid method: ${method}. Use: sepay, momo, zalopay, payos, stripe` });
         return;
     }
 
@@ -146,7 +153,7 @@ router.get('/plans/:product', (req: Request, res: Response) => {
 
   const plans = PRODUCT_PLANS[req.params.product];
   if (!plans) { res.status(404).json({ error: 'Product not found' }); return; }
-  res.json({ plans, currency: 'VND', methods: ['payos', 'momo', 'zalopay', 'stripe'] });
+  res.json({ plans, currency: 'VND', methods: ['sepay', 'momo', 'stripe'] });
 });
 
 export { router as paymentRoutes };

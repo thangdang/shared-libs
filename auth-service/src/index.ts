@@ -1,7 +1,7 @@
 /**
  * Auth Microservice
  * ─────────────────
- * Shared authentication service for all TechFuture products.
+ * Shared authentication service for all WinLux products.
  * Handles: Email/Password, Google SSO, OTP (eSMS), JWT tokens
  *
  * Port: 3007
