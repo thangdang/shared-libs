@@ -1,0 +1,15 @@
+# Shared RAG Library — Dependencies
+# ─────────────────────────────────────────────────────────────
+# Vector store + embeddings for all AI engines
+
+# Embeddings
+sentence-transformers>=2.2.2
+numpy>=1.26.0
+
+# Vector stores
+faiss-cpu>=1.7.4
+chromadb>=0.4.22
+
+# MongoDB sync
+pymongo>=4.6.0
+motor>=3.3.0
