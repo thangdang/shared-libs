@@ -12,6 +12,9 @@ from typing import AsyncIterator, List, Optional
 from shared_llm_client.cache import LLMCache
 from shared_llm_client.circuit_breaker import CircuitBreaker, CircuitState
 from shared_llm_client.fallback import FallbackChain
+from shared_llm_client.model_router import ModelRouter, ModelSelection
+from shared_llm_client.prompt_guard import PromptGuard
+from shared_llm_client.sanitizer import PromptSanitizer
 from shared_llm_client.providers.groq import GroqProvider
 from shared_llm_client.providers.ollama import OllamaProvider
 from shared_llm_client.providers.template import TemplateProvider
@@ -46,6 +49,9 @@ class LLMClient:
         circuit_failure_threshold: int = 5,
         circuit_reset_timeout: int = 30,
         groq_api_key: str | None = None,
+        product: str = "default",
+        sanitization_enabled: bool = True,
+        guard_enabled: bool = True,
     ):
         """Initialize unified LLM client.
 
@@ -57,13 +63,22 @@ class LLMClient:
             circuit_failure_threshold: Failures before circuit opens.
             circuit_reset_timeout: Seconds before probe attempt.
             groq_api_key: Optional Groq API key.
+            product: Product name (for routing, sanitization, audit).
+            sanitization_enabled: Enable PII sanitization for external calls.
+            guard_enabled: Enable prompt injection guard.
         """
         self._ollama_url = ollama_url
+        self._product = product
         self._cache = LLMCache(redis_url, default_ttl=cache_ttl)
         self._circuit_breaker = CircuitBreaker(
             failure_threshold=circuit_failure_threshold,
             reset_timeout=circuit_reset_timeout,
         )
+
+        # Security components
+        self._sanitizer = PromptSanitizer(product=product) if sanitization_enabled else None
+        self._guard = PromptGuard() if guard_enabled else None
+        self._router = ModelRouter(product=product)
 
         # Build provider instances
         self._ollama = OllamaProvider(ollama_url)
@@ -93,22 +108,48 @@ class LLMClient:
         json_schema: dict | None = None,
         stream: bool = False,
         skip_cache: bool = False,
+        task_type: str | None = None,
+        user_input: str | None = None,
     ) -> "LLMResponse | AsyncIterator[str]":
         """Generate text. Returns LLMResponse or async iterator if stream=True.
 
         Args:
             prompt: Input prompt.
-            model: Model name (default "qwen2.5:7b").
+            model: Model name (default "qwen2.5:7b"). If task_type provided, auto-routed.
             temperature: Sampling temperature.
             max_tokens: Maximum tokens to generate.
             timeout: Request timeout (default 30s, use 120s for long gen).
             json_schema: If provided, request JSON output mode.
             stream: If True, return async iterator of SSE events.
             skip_cache: If True, bypass cache lookup.
+            task_type: Optional task type for auto model routing.
+            user_input: Original user input (checked for injection separately from prompt).
 
         Returns:
             LLMResponse for non-streaming, AsyncIterator[str] for streaming.
         """
+        # === SECURITY: Check user input for injection ===
+        if user_input and self._guard:
+            guard_result = self._guard.check(user_input)
+            if not guard_result["safe"]:
+                logger.warning(
+                    f"[{self._product}] Injection blocked: {guard_result['reason']}"
+                )
+                return LLMResponse(
+                    content="Xin lỗi, tôi không thể xử lý yêu cầu này.",
+                    provider="guard",
+                    cached=False,
+                    degraded=True,
+                    usage=None,
+                )
+
+        # === ROUTING: Auto-select model based on task_type ===
+        if task_type:
+            selection = self._router.get_model(task_type, max_tokens)
+            model = selection.model
+            timeout = selection.timeout_seconds
+            logger.debug(f"[{self._product}] Routed: {selection.reason}")
+
         if stream:
             return self._stream(prompt, model, temperature, max_tokens, timeout)
 
@@ -125,6 +166,19 @@ class LLMClient:
                     usage=None,
                 )
 
+        # === SECURITY: Sanitize prompt before external providers ===
+        sanitized_prompt = prompt
+        if self._sanitizer:
+            # Determine which provider will likely be used
+            target_provider = "ollama" if self._circuit_breaker.can_execute() else "groq"
+            result = self._sanitizer.sanitize(prompt, provider=target_provider)
+            sanitized_prompt = result.clean_text
+            if result.fields_redacted > 0:
+                logger.info(
+                    f"[{self._product}] Sanitized {result.fields_redacted} fields "
+                    f"for {target_provider}"
+                )
+
         # Determine which providers to skip based on circuit breaker
         skip_providers = []
         if not self._circuit_breaker.can_execute():
@@ -133,7 +187,7 @@ class LLMClient:
         # Generate with fallback chain + retry
         json_mode = json_schema is not None
         response = await self._generate_with_retry(
-            prompt, model, temperature, max_tokens, timeout, json_mode, skip_providers
+            sanitized_prompt, model, temperature, max_tokens, timeout, json_mode, skip_providers
         )
 
         # Cache successful non-degraded responses
@@ -293,13 +347,22 @@ class LLMClient:
         """Return client status: circuit state, cache stats, provider availability.
 
         Returns:
-            Dict with circuit_breaker, cache, and providers status.
+            Dict with circuit_breaker, cache, providers, routing, and security status.
         """
         return {
+            "product": self._product,
             "circuit_breaker": {
                 "state": self._circuit_breaker.get_state().value,
                 "failure_count": self._circuit_breaker.failure_count,
             },
             "cache": self._cache.get_stats(),
             "providers": [p.name for p in self._fallback.providers],
+            "routing": {
+                "enabled": True,
+                "model_stats": self._router.get_model_stats(),
+            },
+            "security": {
+                "sanitization_enabled": self._sanitizer is not None,
+                "guard_enabled": self._guard is not None,
+            },
         }
