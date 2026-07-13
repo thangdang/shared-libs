@@ -14,6 +14,7 @@ const BASE_URLS: Record<string, string> = {
   smartbuy: 'https://smartbuy.winlux.com',
   caremate: 'https://caremate.winlux.com',
   fintax: 'https://fintax.winlux.com',
+  doctorcar: 'https://doctorcar.winlux.com',
 };
 
 const UTM_BASE = 'utm_medium=cross_promo';
@@ -30,6 +31,7 @@ interface LinkContext {
   keywords?: string[];
   productName?: string;
   articleTopic?: string;
+  action?: string;
 }
 
 /**
@@ -48,6 +50,15 @@ export function getCrossLinks(currentProduct: string, context: LinkContext): Cro
           label: 'Xem hướng dẫn sử dụng thuốc',
           url: `${BASE_URLS.caremate}/suc-khoe?${utm}`,
           icon: '🏥',
+        });
+      }
+      // SmartBuy → DoctorCar (auto parts, vehicle keywords)
+      if (context.keywords?.some(k => ['phụ tùng', 'ô tô', 'xe hơi', 'bảo dưỡng', 'dầu máy'].includes(k))) {
+        links.push({
+          product: 'doctorcar',
+          label: '🚗 Kiểm tra xe miễn phí',
+          url: `${BASE_URLS.doctorcar}/kiem-tra?${utm}`,
+          icon: '🚗',
         });
       }
       // SmartBuy → FIN Tax (spending tracking)
@@ -102,6 +113,37 @@ export function getCrossLinks(currentProduct: string, context: LinkContext): Cro
         url: `${BASE_URLS.smartbuy}/flash-sale?${utm}`,
         icon: '⚡',
       });
+      // FIN Tax → DoctorCar (vehicle expense category)
+      if (context.keywords?.some(k => ['bảo dưỡng', 'sửa xe', 'xăng dầu', 'bảo hiểm xe'].includes(k))) {
+        links.push({
+          product: 'doctorcar',
+          label: 'Lịch bảo dưỡng thông minh',
+          url: `${BASE_URLS.doctorcar}/lich-bao-duong?${utm}`,
+          icon: '🚗',
+        });
+      }
+      break;
+
+    case 'doctorcar':
+      // DoctorCar → SmartBuy (buy parts at good price)
+      if (context.keywords?.some(k => ['phụ tùng', 'lọc gió', 'lọc dầu', 'má phanh', 'bugi', 'ắc quy', 'lốp xe', 'dầu máy'].includes(k))) {
+        const query = context.productName || context.keywords?.find(k => ['phụ tùng', 'lọc gió', 'lọc dầu', 'má phanh', 'bugi', 'ắc quy', 'lốp xe', 'dầu máy'].includes(k)) || '';
+        links.push({
+          product: 'smartbuy',
+          label: '🛒 Mua phụ tùng giá tốt',
+          url: `${BASE_URLS.smartbuy}/tim-kiem?q=${encodeURIComponent(query)}&${utm}`,
+          icon: '🛒',
+        });
+      }
+      // DoctorCar → FIN Tax (record maintenance expense)
+      if (context.action === 'maintenance_complete') {
+        links.push({
+          product: 'fintax',
+          label: '💰 Ghi nhận chi phí bảo dưỡng',
+          url: `${BASE_URLS.fintax}/ghi-chi-phi?category=bao-duong&${utm}`,
+          icon: '💰',
+        });
+      }
       break;
   }
 

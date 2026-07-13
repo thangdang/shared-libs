@@ -8,10 +8,13 @@ export interface IPayment {
   currency: string;
   method: 'sepay' | 'momo' | 'zalopay' | 'payos' | 'stripe';
   plan: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: 'pending' | 'completed' | 'failed' | 'refunded' | 'partially_refunded';
   provider_transaction_id?: string;
   confirmed_by?: string;
   confirmed_at?: Date;
+  refunded_at?: Date;
+  refund_amount?: number;
+  refund_reason?: string;
   metadata?: Record<string, any>;
   created_at: Date;
   updated_at: Date;
@@ -25,10 +28,13 @@ const paymentSchema = new Schema<IPayment>({
   currency: { type: String, default: 'VND' },
   method: { type: String, required: true, enum: ['sepay', 'momo', 'zalopay', 'payos', 'stripe'] },
   plan: { type: String, required: true },
-  status: { type: String, default: 'pending', enum: ['pending', 'completed', 'failed', 'refunded'] },
+  status: { type: String, default: 'pending', enum: ['pending', 'completed', 'failed', 'refunded', 'partially_refunded'] },
   provider_transaction_id: String,
   confirmed_by: String,
   confirmed_at: Date,
+  refunded_at: Date,
+  refund_amount: Number,
+  refund_reason: String,
   metadata: { type: Schema.Types.Mixed, default: {} },
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 

@@ -4,7 +4,7 @@
  * Shared authentication service for all WinLux products.
  * Handles: Email/Password, Google SSO, OTP (eSMS), JWT tokens
  *
- * Port: 3007
+ * Port: 4100
  * Internal only — called by product services via localhost
  *
  * Flow:
@@ -21,11 +21,18 @@ import dotenv from 'dotenv';
 import { authRoutes } from './routes/auth.routes';
 import { userRoutes } from './routes/user.routes';
 import { tokenRoutes } from './routes/token.routes';
+import {
+  ApiResponse,
+  AppError,
+  successResponse,
+  errorResponse,
+  errorHandler,
+} from '../../service-clients/types/api-response';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3007;
+const PORT = process.env.PORT || 4100;
 
 app.use(helmet());
 app.use(cors({ origin: '*' }));
@@ -40,6 +47,9 @@ app.use('/api/auth/token', tokenRoutes);
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'auth-service', version: '1.0.0' });
 });
+
+// Shared error handler — must be AFTER all routes
+app.use(errorHandler);
 
 async function start() {
   const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/auth';

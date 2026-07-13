@@ -2,11 +2,11 @@
  * Payment Service Client
  * ──────────────────────
  * Drop this file into any product service's src/services/ folder.
- * Calls the shared payment-service at localhost:3006.
+ * Calls the shared payment-service at localhost:4101.
  */
 import axios from 'axios';
 
-const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:3006';
+const PAYMENT_SERVICE_URL = process.env.PAYMENT_SERVICE_URL || 'http://localhost:4101';
 
 export interface CreatePaymentInput {
   product: string;

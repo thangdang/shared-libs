@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{reportTitle}}</title>
+  <style>
+    :root {
+      --brand-color: {{brandColor}};
+      --brand-logo-url: {{brandLogoUrl}};
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f7;">
+    <tr>
+      <td align="center" style="padding: 24px 16px;">
+        <!-- Header -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px;">
+          <tr>
+            <td align="center" style="padding: 24px 0;">
+              <img src="{{brandLogoUrl}}" alt="{{productName}}" style="height: 40px; max-width: 180px;" />
+            </td>
+          </tr>
+        </table>
+
+        <!-- Main Content -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden;">
+          <tr>
+            <td style="padding: 32px 24px;">
+              <h1 style="margin: 0 0 8px 0; font-size: 22px; color: #111827;">{{reportTitle}}</h1>
+              <p style="margin: 0 0 24px 0; color: #6b7280; font-size: 14px;">Kỳ báo cáo: <strong>{{reportPeriod}}</strong></p>
+
+              <!-- Summary Metrics -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                {{#metrics}}
+                <tr>
+                  <td style="padding: 12px; background-color: #f9fafb; border-radius: 6px; margin-bottom: 8px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="font-size: 13px; color: #6b7280;">{{metricLabel}}</td>
+                        <td align="right" style="font-size: 18px; font-weight: 700; color: {{brandColor}};">{{metricValue}}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr><td style="height: 8px;"></td></tr>
+                {{/metrics}}
+              </table>
+
+              <!-- Key Highlights -->
+              <h2 style="margin: 0 0 12px 0; font-size: 16px; color: #111827;">Điểm nổi bật</h2>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+                {{#highlights}}
+                <tr>
+                  <td style="padding: 8px 0; font-size: 14px; color: #374151; line-height: 1.5;">
+                    ✅ {{highlightText}}
+                  </td>
+                </tr>
+                {{/highlights}}
+              </table>
+
+              <!-- Call to Action -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 8px 0;">
+                    <a href="{{ctaUrl}}" style="display: inline-block; padding: 14px 32px; background-color: {{brandColor}}; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; border-radius: 6px;">
+                      {{ctaText}}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Footer -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px;">
+          <tr>
+            <td align="center" style="padding: 24px 16px; color: #6b7280; font-size: 12px; line-height: 1.5;">
+              <p style="margin: 0 0 8px 0;">© {{year}} WinLux. Mọi quyền được bảo lưu.</p>
+              <p style="margin: 0;">
+                <a href="{{unsubscribeUrl}}" style="color: #6b7280; text-decoration: underline;">Hủy đăng ký nhận email</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

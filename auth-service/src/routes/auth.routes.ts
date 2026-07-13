@@ -1,5 +1,5 @@
 /**
- * Auth Routes — Register, Login, OTP, Google SSO
+ * Auth Routes — Register, Login, OTP, Google SSO, Zalo SSO
  */
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { sendOTP, verifyOTP } from '../services/otp.service';
 import { verifyGoogleToken } from '../services/google.service';
+import { authenticateWithZalo } from '../services/zalo.service';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'winlux-jwt-secret-change-me';
@@ -111,6 +112,25 @@ router.post('/google', async (req: Request, res: Response) => {
     res.json({ token, user: sanitizeUser(user) });
   } catch (error) {
     res.status(500).json({ error: 'Google login thất bại' });
+  }
+});
+
+/**
+ * POST /api/auth/zalo — Zalo SSO login/register (OAuth + Mini App)
+ */
+router.post('/zalo', async (req: Request, res: Response) => {
+  try {
+    const { code, product, mini_app } = req.body;
+
+    if (!code || !product) {
+      res.status(400).json({ error: 'code và product là bắt buộc' });
+      return;
+    }
+
+    const result = await authenticateWithZalo({ code, product, mini_app });
+    res.json({ success: true, data: { token: result.token, user: result.user } });
+  } catch (error) {
+    res.status(500).json({ error: 'Zalo login thất bại' });
   }
 });
 

@@ -1,0 +1,5 @@
+specVersion: 1.0
+name: vn-market-improvements
+description: Enhance shared-libs for VN market — phone, address, currency, Zalo SSO, notification channels, payment refund, cross-product links
+createdAt: 2026-07-07
+status: in_progress

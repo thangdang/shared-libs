@@ -2,7 +2,7 @@
  * Auth Service Client
  * ───────────────────
  * Drop this file into any product service's src/services/ folder.
- * Calls the shared auth-service at localhost:3007.
+ * Calls the shared auth-service at localhost:4100.
  *
  * For JWT verification, product services can verify locally using JWT_SECRET
  * (faster, no network hop) OR call auth-service for full verification.
@@ -10,7 +10,7 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:3007';
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:4100';
 const JWT_SECRET = process.env.JWT_SECRET || 'winlux-jwt-secret-change-me';
 
 export interface AuthUser {
@@ -57,6 +57,18 @@ export async function login(email: string, password: string): Promise<LoginResul
 export async function googleAuth(idToken: string, product: string): Promise<LoginResult> {
   try {
     const res = await axios.post(`${AUTH_SERVICE_URL}/api/auth/google`, { idToken, product }, { timeout: 5000 });
+    return { success: true, token: res.data.token, user: res.data.user };
+  } catch (error: any) {
+    return { success: false, error: error.response?.data?.error || error.message };
+  }
+}
+
+/**
+ * Login/register with Zalo OAuth.
+ */
+export async function zaloAuth(code: string, product: string, miniApp?: boolean): Promise<LoginResult> {
+  try {
+    const res = await axios.post(`${AUTH_SERVICE_URL}/api/auth/zalo`, { code, product, mini_app: miniApp }, { timeout: 5000 });
     return { success: true, token: res.data.token, user: res.data.user };
   } catch (error: any) {
     return { success: false, error: error.response?.data?.error || error.message };

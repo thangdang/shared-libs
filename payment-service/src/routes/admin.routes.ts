@@ -90,10 +90,10 @@ router.post('/confirm/:orderId', async (req: Request, res: Response) => {
     // Notify product service
     const axios = require('axios');
     const PRODUCT_URLS: Record<string, string> = {
-      trendbriefai: 'http://localhost:3000/internal/payment-completed',
-      smartbuy: 'http://localhost:3001/internal/payment-completed',
-      caremate: 'http://localhost:3002/internal/payment-completed',
-      fintax: 'http://localhost:3003/internal/payment-completed',
+      trendbriefai: 'http://localhost:4002/internal/payment-completed',
+      smartbuy: 'http://localhost:4001/internal/payment-completed',
+      caremate: 'http://localhost:4003/internal/payment-completed',
+      fintax: 'http://localhost:4004/internal/payment-completed',
     };
     const url = PRODUCT_URLS[payment.product];
     if (url) {

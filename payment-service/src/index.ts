@@ -4,7 +4,7 @@
  * Shared payment service for all WinLux products.
  * Handles: SePay (default), MoMo, ZaloPay, payOS, Stripe
  *
- * Port: 3006
+ * Port: 4101
  * Internal only — called by product services via localhost
  * Webhooks exposed via Nginx: api.winlux.com/payment/*
  */
@@ -18,11 +18,18 @@ import dotenv from 'dotenv';
 import { paymentRoutes } from './routes/payment.routes';
 import { webhookRoutes } from './routes/webhook.routes';
 import { adminRoutes } from './routes/admin.routes';
+import {
+  ApiResponse,
+  AppError,
+  successResponse,
+  errorResponse,
+  errorHandler,
+} from '../../service-clients/types/api-response';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3006;
+const PORT = process.env.PORT || 4101;
 
 // Middleware
 app.use(helmet());
@@ -38,6 +45,9 @@ app.use('/api/payment/admin', adminRoutes);
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'payment-service', version: '1.0.0' });
 });
+
+// Shared error handler — must be AFTER all routes
+app.use(errorHandler);
 
 // Connect DB and start
 async function start() {

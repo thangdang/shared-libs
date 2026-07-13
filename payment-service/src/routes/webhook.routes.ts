@@ -9,16 +9,17 @@ import { verifyZaloPayCallback } from '../providers/zalopay';
 import { verifyPayOSWebhook } from '../providers/payos';
 import { verifySepayWebhook, verifySepaySignature } from '../providers/sepay';
 import { verifyStripeWebhook } from '../providers/stripe';
+import { webhookTracker } from '../webhook-tracker';
 import axios from 'axios';
 
 const router = Router();
 
 // Callback URLs for product services (to notify subscription activation)
 const PRODUCT_CALLBACK_URLS: Record<string, string> = {
-  trendbriefai: 'http://localhost:3000/internal/payment-completed',
-  smartbuy: 'http://localhost:3001/internal/payment-completed',
-  caremate: 'http://localhost:3002/internal/payment-completed',
-  fintax: 'http://localhost:3003/internal/payment-completed',
+  trendbriefai: 'http://localhost:4002/internal/payment-completed',
+  smartbuy: 'http://localhost:4001/internal/payment-completed',
+  caremate: 'http://localhost:4003/internal/payment-completed',
+  fintax: 'http://localhost:4004/internal/payment-completed',
 };
 
 async function notifyProductService(payment: any): Promise<void> {
@@ -46,12 +47,17 @@ router.post('/sepay', async (req: Request, res: Response) => {
     // Verify HMAC signature if provided
     const signature = req.headers['x-sepay-signature'] as string;
     if (signature && !verifySepaySignature(req.body, signature)) {
+      webhookTracker.recordFailure('sepay', 'Invalid HMAC signature');
       res.status(400).json({ success: false });
       return;
     }
 
     const { valid, orderId, success, transId, amount } = verifySepayWebhook(req.body);
-    if (!valid) { res.json({ success: true }); return; } // Return 200 to avoid retries
+    if (!valid) {
+      webhookTracker.recordFailure('sepay', 'Invalid webhook payload');
+      res.json({ success: true }); // Return 200 to avoid retries
+      return;
+    }
 
     // Try to find payment by order_id or by metadata.order_code
     let payment = await Payment.findOne({ order_id: orderId, status: 'pending' });
@@ -74,8 +80,10 @@ router.post('/sepay', async (req: Request, res: Response) => {
       await payment.save();
     }
 
+    webhookTracker.recordSuccess('sepay');
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    webhookTracker.recordFailure('sepay', error?.message || 'Unknown error');
     console.error('[Webhook] SePay error:', error);
     res.json({ success: true }); // Always return 200 to SePay
   }
@@ -87,7 +95,11 @@ router.post('/sepay', async (req: Request, res: Response) => {
 router.post('/momo', async (req: Request, res: Response) => {
   try {
     const { valid, orderId, success, transId } = verifyMoMoWebhook(req.body);
-    if (!valid) { res.status(400).json({ error: 'Invalid signature' }); return; }
+    if (!valid) {
+      webhookTracker.recordFailure('momo', 'Invalid signature');
+      res.status(400).json({ error: 'Invalid signature' });
+      return;
+    }
 
     const payment = await Payment.findOne({ order_id: orderId });
     if (!payment) { res.status(404).json({ error: 'Payment not found' }); return; }
@@ -102,8 +114,10 @@ router.post('/momo', async (req: Request, res: Response) => {
       await payment.save();
     }
 
+    webhookTracker.recordSuccess('momo');
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    webhookTracker.recordFailure('momo', error?.message || 'Unknown error');
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 });
@@ -114,7 +128,11 @@ router.post('/momo', async (req: Request, res: Response) => {
 router.post('/zalopay', async (req: Request, res: Response) => {
   try {
     const { valid, appTransId, success, transId } = verifyZaloPayCallback(req.body);
-    if (!valid) { res.json({ return_code: 2, return_message: 'Invalid mac' }); return; }
+    if (!valid) {
+      webhookTracker.recordFailure('zalopay', 'Invalid mac');
+      res.json({ return_code: 2, return_message: 'Invalid mac' });
+      return;
+    }
 
     const payment = await Payment.findOne({ 'metadata.app_trans_id': appTransId });
     if (!payment) { res.json({ return_code: 2, return_message: 'Order not found' }); return; }
@@ -126,8 +144,10 @@ router.post('/zalopay', async (req: Request, res: Response) => {
       await notifyProductService(payment);
     }
 
+    webhookTracker.recordSuccess('zalopay');
     res.json({ return_code: 1, return_message: 'success' });
-  } catch (error) {
+  } catch (error: any) {
+    webhookTracker.recordFailure('zalopay', error?.message || 'Unknown error');
     res.json({ return_code: 0, return_message: 'Error' });
   }
 });
@@ -138,7 +158,11 @@ router.post('/zalopay', async (req: Request, res: Response) => {
 router.post('/payos', async (req: Request, res: Response) => {
   try {
     const { valid, orderCode, success, transId } = verifyPayOSWebhook(req.body);
-    if (!valid) { res.status(400).json({ error: 'Invalid webhook' }); return; }
+    if (!valid) {
+      webhookTracker.recordFailure('payos', 'Invalid webhook');
+      res.status(400).json({ error: 'Invalid webhook' });
+      return;
+    }
 
     const payment = await Payment.findOne({ 'metadata.order_code': orderCode, status: 'pending' });
     if (!payment) { res.status(404).json({ error: 'Payment not found' }); return; }
@@ -150,8 +174,10 @@ router.post('/payos', async (req: Request, res: Response) => {
       await notifyProductService(payment);
     }
 
+    webhookTracker.recordSuccess('payos');
     res.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    webhookTracker.recordFailure('payos', error?.message || 'Unknown error');
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 });
@@ -163,7 +189,11 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req: Re
   try {
     const signature = req.headers['stripe-signature'] as string;
     const { valid, orderId, success, transId, metadata } = verifyStripeWebhook(req.body, signature);
-    if (!valid) { res.status(400).json({ error: 'Invalid signature' }); return; }
+    if (!valid) {
+      webhookTracker.recordFailure('stripe', 'Invalid signature');
+      res.status(400).json({ error: 'Invalid signature' });
+      return;
+    }
 
     const payment = await Payment.findOne({ order_id: orderId });
     if (!payment) { res.status(404).json({ error: 'Payment not found' }); return; }
@@ -175,13 +205,25 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req: Re
       await notifyProductService(payment);
     }
 
+    webhookTracker.recordSuccess('stripe');
     res.json({ received: true });
-  } catch (error) {
+  } catch (error: any) {
+    webhookTracker.recordFailure('stripe', error?.message || 'Unknown error');
     res.status(500).json({ error: 'Webhook processing failed' });
   }
 });
 
 // Need to import express for raw body parser
 import express from 'express';
+
+/**
+ * GET /api/payment/webhook/health — Webhook health status dashboard
+ * Returns consecutive failure counts and health status per provider
+ */
+router.get('/health', (req: Request, res: Response) => {
+  const status = webhookTracker.getHealthStatus();
+  const httpStatus = status.overall === 'healthy' ? 200 : 503;
+  res.status(httpStatus).json(status);
+});
 
 export { router as webhookRoutes };

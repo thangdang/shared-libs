@@ -11,6 +11,7 @@ Public API:
 
     Routing:
     ModelRouter — Routes tasks to optimal model by complexity
+    ModelStrategy — YAML-driven model routing with trust levels
     Complexity — Task complexity enum
     ModelSelection — Model selection result
 
@@ -24,6 +25,13 @@ Public API:
     AgentMemory — Persistent lessons learned across sessions
     FewShotManager — Vietnamese few-shot example management
     self_reflect — AI self-validation before returning output
+
+    Prompts:
+    prompts.ClassificationTemplate — Vietnamese classification prompts
+    prompts.GenerationTemplate — Vietnamese content generation prompts
+    prompts.SummarizationTemplate — Vietnamese summarization prompts
+    prompts.ExtractionTemplate — Vietnamese data extraction prompts
+    prompts.ReasoningTemplate — Vietnamese reasoning/analysis prompts
 
     Guard:
     AgentGuard — Rate limiting + circuit breaker per product
@@ -48,6 +56,7 @@ from shared_llm_client.few_shot import FewShotManager
 from shared_llm_client.self_reflect import self_reflect, get_criteria
 from shared_llm_client.safety_layer import SafetyLayer, SafetyResult
 from shared_llm_client.confidence_router import ConfidenceRouter, ConfidenceResult
+from shared_llm_client.model_strategy import ModelStrategy
 
 __all__ = [
     # Core client
@@ -85,4 +94,6 @@ __all__ = [
     # Circuit breaker
     "CircuitBreaker",
     "CircuitState",
+    # Strategy
+    "ModelStrategy",
 ]

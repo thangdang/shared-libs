@@ -78,8 +78,8 @@ echo   Ollama          : http://localhost:11434
 echo   TrendBrief      : http://localhost:8000
 echo   SmartBuy        : http://localhost:8001
 echo   CareMate        : http://localhost:8002
-echo   FIN Tax         : http://localhost:5000
-echo   Video Engine    : http://localhost:5001
+echo   FIN Tax         : http://localhost:8004
+echo   Video Engine    : http://localhost:8006
 echo.
 echo Press any key to close this window (engines continue running)...
 pause >NUL

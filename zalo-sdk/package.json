@@ -1,0 +1,16 @@
+{
+  "name": "@winlux/zalo-sdk",
+  "version": "1.0.0",
+  "description": "Shared Zalo integration SDK — SSO, OA messaging, share cards, webhooks",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.0.0"
+  }
+}
