@@ -1,1 +1,0 @@
-# shared-vn-nlp tests

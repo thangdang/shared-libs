@@ -1,0 +1,74 @@
+{
+  "name": "@winlux/core",
+  "version": "1.0.0",
+  "description": "Unified shared library for all WinLux products — auth, payment, notification, analytics, zalo-sdk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./auth": {
+      "import": "./dist/auth/index.js",
+      "require": "./dist/auth/index.js",
+      "types": "./dist/auth/index.d.ts"
+    },
+    "./payment": {
+      "import": "./dist/payment/index.js",
+      "require": "./dist/payment/index.js",
+      "types": "./dist/payment/index.d.ts"
+    },
+    "./notification": {
+      "import": "./dist/notification/index.js",
+      "require": "./dist/notification/index.js",
+      "types": "./dist/notification/index.d.ts"
+    },
+    "./analytics": {
+      "import": "./dist/analytics/index.js",
+      "require": "./dist/analytics/index.js",
+      "types": "./dist/analytics/index.d.ts"
+    },
+    "./zalo": {
+      "import": "./dist/zalo/index.js",
+      "require": "./dist/zalo/index.js",
+      "types": "./dist/zalo/index.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "bcryptjs": "^2.4.3",
+    "ioredis": "^5.4.0",
+    "jsonwebtoken": "^9.0.0"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0 || ^5.0.0",
+    "mongoose": "^8.0.0",
+    "stripe": "^17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "stripe": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.0.0"
+  }
+}

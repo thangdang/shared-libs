@@ -1,0 +1,68 @@
+<!--
+  TrendBrief AI — Weekly Digest Email Template (T35 — REQ-19)
+  Sent: Every Monday 7:00 AM VN time
+  Content: Top 10 articles of the week, personalized by user's topic preferences.
+  Variables: {{userName}}, {{articles}}, {{weekLabel}}, {{unsubscribeUrl}}
+-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📰 Bản tin tuần — TrendBrief AI</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 24px; text-align: center; }
+    .header h1 { color: white; font-size: 20px; margin: 0; }
+    .header p { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 4px; }
+    .content { padding: 24px; }
+    .greeting { font-size: 15px; color: #374151; margin-bottom: 16px; }
+    .article { border-bottom: 1px solid #f1f5f9; padding: 14px 0; }
+    .article:last-child { border-bottom: none; }
+    .article-num { display: inline-block; width: 24px; height: 24px; background: #6366f1; color: white; border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; font-weight: 700; margin-right: 10px; vertical-align: top; }
+    .article-title { font-size: 15px; font-weight: 600; color: #1a1a2e; text-decoration: none; line-height: 1.4; }
+    .article-title:hover { color: #6366f1; }
+    .article-meta { font-size: 12px; color: #9ca3af; margin-top: 4px; margin-left: 34px; }
+    .article-topic { background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 11px; color: #6366f1; }
+    .cta-box { background: #f8fafc; border-radius: 8px; padding: 16px; text-align: center; margin-top: 20px; }
+    .cta-btn { display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; }
+    .footer { padding: 16px 24px; text-align: center; font-size: 11px; color: #9ca3af; border-top: 1px solid #f1f5f9; }
+    .footer a { color: #6366f1; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📰 Bản tin tuần — {{weekLabel}}</h1>
+      <p>Top 10 tin tức được đọc nhiều nhất tuần qua</p>
+    </div>
+    <div class="content">
+      <p class="greeting">Chào {{userName}} 👋</p>
+      <p style="font-size:14px;color:#4b5563;margin-bottom:20px;">
+        Đây là 10 bài viết nổi bật nhất tuần qua theo sở thích của bạn. Đọc nhanh trong 3 phút!
+      </p>
+
+      <!-- Article list (populated by template engine) -->
+      {{#each articles}}
+      <div class="article">
+        <span class="article-num">{{@index_1}}</span>
+        <a href="{{this.url}}" class="article-title">{{this.title}}</a>
+        <div class="article-meta">
+          <span class="article-topic">{{this.topic}}</span> · {{this.reading_time}}s đọc
+        </div>
+      </div>
+      {{/each}}
+
+      <div class="cta-box">
+        <p style="font-size:14px;color:#4b5563;margin:0 0 12px;">Muốn đọc thêm?</p>
+        <a href="https://trendbriefai.winlux.com/feed" class="cta-btn">Xem tất cả bài viết →</a>
+      </div>
+    </div>
+    <div class="footer">
+      <p>Bạn nhận email này vì đã đăng ký TrendBrief AI.</p>
+      <p><a href="{{unsubscribeUrl}}">Hủy đăng ký</a> · <a href="https://trendbriefai.winlux.com">TrendBrief AI</a></p>
+    </div>
+  </div>
+</body>
+</html>

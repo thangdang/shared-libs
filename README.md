@@ -1,50 +1,180 @@
 # 📦 Shared Libraries
 
-> Reusable libraries and microservices shared across the WinLux AI portfolio.
+> Reusable libraries shared across the WinLux AI portfolio.
+> **Architecture:  Unified packages** — apps import from `@winlux/core` (TypeScript) or `winlux` (Python).
 
-## Libraries
+## 🚀 Packages
 
-| Library | Stack | Description |
-|---------|-------|-------------|
-| `auth-service/` | Node.js + Express + TypeScript | SSO (Google, Zalo), OTP, JWT authentication microservice |
-| `payment-service/` | Node.js + Express + TypeScript | MoMo, ZaloPay, payOS, Stripe, SePay payment gateway + refund flow |
-| `notification-service/` | Node.js + Express + TypeScript | Multi-channel notifications (FCM, Zalo OA, email, SMS) with scheduling + fallback |
-| `offline-resilience/` | Node.js + TypeScript | Offline resilience pattern for VPS services |
-| `rag/` | Python | Shared RAG infrastructure (embeddings, vector store, sync) |
-| `shared-crawler/` | Python | Config-driven crawl engine with proxy pool and dedup |
-| `shared-llm-client/` | Python | Unified LLM client with retry, caching, circuit breaker |
-| `shared-vn-nlp/` | Python | Vietnamese NLP (tokenization, sentiment, lunar calendar, phone normalization, currency formatting, address parsing) |
-| `product-linker/` | Python + FastAPI | Product/topic detection and affiliate linking |
-| `service-clients/` | TypeScript | Cross-product HTTP client helpers, error handler middleware, analytics client |
-| `performance/` | Mixed | MongoDB indexes, Redis config, Nginx caching, monitoring |
-| `deploy/` | Shell scripts | VPS deployment automation (setup, SSL, firewall, backup) |
+| Package | Language | Description |
+|---------|----------|-------------|
+| `@winlux/core` | TypeScript | Auth, payment, notification, analytics, zalo, clients, resilience |
+| `winlux` | Python | LLM, NLP, crawler, RAG, product linker |
+| `winlux_core` | Dart/Flutter | Mobile utilities — auth, API, payment, notifications |
 
-## Installation
+### Quick Start
 
-### Python libraries (editable install)
-```bash
-pip install -e shared-vn-nlp/
-pip install -e shared-llm-client/
-pip install -e shared-crawler/
-pip install -e product-linker/
+```powershell
+cd C:\Users\evtxd01\learn_python\shared-libs
+
+# Build unified packages
+.\build-unified.ps1    # PowerShell
+.\build-unified.bat    # CMD/Batch
 ```
 
-### Node.js services
-```bash
-cd auth-service && npm install
-cd payment-service && npm install
+---
+
+## Usage
+
+### TypeScript
+
+**package.json:**
+```json
+{
+  "dependencies": {
+    "@winlux/core": "file:../../shared-libs/core"
+  }
+}
 ```
 
-## Architecture
+**Import:**
+```typescript
+// Main modules
+import { TokenService, requireAuth } from '@winlux/core/auth';
+import { SepayProvider } from '@winlux/core/payment';
+import { NotificationClient } from '@winlux/core/notification';
+import { Analytics } from '@winlux/core/analytics';
+import { ZaloSSO, ZaloOA } from '@winlux/core/zalo';
 
-All shared libraries are designed to be installed as local packages by the product repos.  Python libs use `pyproject.toml` with setuptools, Node.js services run as standalone microservices.
+// HTTP clients
+import { AuthClient, PaymentClient } from '@winlux/core/clients';
 
-## New in July 2026
+// Offline resilience
+import { OfflineResilience, EmergencyDetector } from '@winlux/core/resilience';
+```
 
-VN market improvements across the shared library portfolio:
+### Python
 
-- **shared-vn-nlp** — Added phone number normalization (E.164, carrier detection), Vietnamese currency formatting (VND, compact K/triệu/tỷ), and address parsing (street/ward/district/province with confidence scoring)
-- **auth-service** — Zalo SSO integration (OAuth web/app + Mini App login) with automatic account merge by phone number
-- **notification-service** — Email (Resend) and SMS (eSMS.vn) channels, configurable fallback chains, BullMQ-based scheduling with quiet hours enforcement
-- **payment-service** — Full and partial refund flow across all providers (SePay, MoMo, Stripe, ZaloPay, payOS), reconciliation job for stuck payments, admin stats endpoint
-- **service-clients** — Notification client, analytics client, shared error handler middleware (`ApiResponse<T>` format with Vietnamese messages), DoctorCar cross-product links
+**requirements.txt:**
+```
+-e ../../shared-libs/winlux[all]
+```
+
+**Import:**
+```python
+# LLM
+from winlux.llm import LLMClient, LiteAgent, ModelStrategy
+
+# Vietnamese NLP
+from winlux.nlp import segment, normalize_slang, format_vnd
+
+# Crawler
+from winlux.crawler import CrawlEngine, ProxyPool, TranslationPipeline
+
+# RAG
+from winlux.rag import VectorStore, EmbeddingService
+
+# Product Linker
+from winlux.linker import MentionDetector, detect_products
+```
+
+### Flutter
+
+**pubspec.yaml:**
+```yaml
+dependencies:
+  winlux_core:
+    path: ../../shared-libs/flutter
+```
+
+---
+
+## Package Structure
+
+### `@winlux/core` (TypeScript)
+
+```
+core/src/
+├── auth/          # Google SSO, Zalo SSO, OTP, JWT, middleware
+├── payment/       # SePay, MoMo, ZaloPay, payOS, Stripe
+├── notification/  # FCM, Zalo OA, Email, SMS, Telegram
+├── analytics/     # Event tracking, revenue, health checks
+├── zalo/          # Zalo SSO, OA messaging, share cards
+├── clients/       # Cross-product HTTP clients
+└── resilience/    # Offline resilience patterns
+```
+
+### `winlux` (Python)
+
+```
+winlux/src/winlux/
+├── llm/           # LLM client — retry, cache, circuit breaker, agents
+├── nlp/           # Vietnamese NLP — tokenization, sentiment, formatting
+├── crawler/       # Crawl engine — proxy pool, scheduler, dedup, translate
+├── rag/           # RAG — embeddings, vector store, retrieval
+└── linker/        # Product/topic detection, affiliate linking
+```
+
+---
+
+## App Integration
+
+### TypeScript Services
+
+| App | Status |
+|-----|--------|
+| smartbuy-service | ✅ |
+| trendbriefai-service | ✅ |
+| caremate-service | ✅ |
+| doctor-car-service | ✅ |
+| fin-tax-service | ✅ |
+| backoffice-service | ✅ |
+| childhood-service | ✅ |
+
+### Python AI Engines
+
+| App | llm | nlp | crawler | rag | linker |
+|-----|-----|-----|---------|-----|--------|
+| smartbuy-ai-engine | ✅ | ✅ | ✅ | ✅ | ✅ |
+| trendbriefai-engine | ✅ | ✅ | ✅ | ✅ | — |
+| caremate-ai-engine | ✅ | ✅ | — | ✅ | ✅ |
+| doctor-car-ai-engine | ✅ | ✅ | ✅ | — | — |
+| fin-tax-ai-engine | ✅ | ✅ | — | ✅ | ✅ |
+| childhood-video-engine | ✅ | ✅ | — | — | — |
+
+### Flutter Mobile Apps
+
+| App | Status |
+|-----|--------|
+| smartbuy-mobile | ✅ |
+| trendbriefai-mobile | ✅ |
+| caremate-mobile | ✅ |
+| doctor-car-mobile | ✅ |
+| fintax-mobile | ✅ |
+
+---
+
+## Building
+
+### TypeScript
+
+```bash
+cd shared-libs/core
+npm install
+npm run build
+```
+
+### Python
+
+```bash
+pip install -e ../../shared-libs/winlux[all]
+```
+
+---
+
+## Related Resources
+
+Deployment scripts and performance configs have been moved to:
+`C:\Users\evtxd01\learn_python\document-idea\go-live\`
+
+- `deploy/` — VPS setup, health checks, Telegram notifications
+- `performance/` — MongoDB indexes, Redis config, scaling runbook

@@ -1,0 +1,62 @@
+# TrendBrief AI — Model routing configuration
+# Maps task_type → model selection rules
+
+product: trendbriefai
+version: "1.0"
+
+default_model: "qwen3:8b"
+default_timeout: 30
+
+tasks:
+  # Simple tasks (qwen2.5:1.5b)
+  article_categorization:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 50
+    description: "Categorize article into topic"
+
+  trend_scoring:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 50
+    description: "Score trend relevance/virality"
+
+  title_generation:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 80
+    description: "Generate attention-grabbing Vietnamese title"
+
+  # Medium tasks (qwen2.5:7b)
+  summarization:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 500
+    description: "Summarize article into bullet points"
+
+  # Complex tasks (qwen3:8b)
+  deep_analysis:
+    complexity: complex
+    model: "qwen3:8b"
+    timeout: 30
+    max_tokens: 800
+    description: "Deep analysis of complex topics"
+
+# Hybrid engine trust levels
+hybrid_rules:
+  categorization: ai_primary   # AI categorizes, rule validates
+  scoring: rule_primary        # Rule scores engagement signals, AI refines
+  summarization: ai_only       # Fully AI task
+  title_generation: ai_only    # Creative AI task
+
+# Cache TTLs
+cache_ttl:
+  article_categorization: 604800  # 7d — articles don't change category
+  trend_scoring: 3600             # 1h — trends shift fast
+  title_generation: 86400         # 24h
+  summarization: 86400            # 24h — article content is static
+  deep_analysis: 43200            # 12h

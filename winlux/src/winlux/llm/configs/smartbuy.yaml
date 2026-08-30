@@ -1,0 +1,81 @@
+# SmartBuy AI — Model routing configuration
+# Maps task_type → model selection rules
+# Used by model_strategy.py to auto-select optimal model
+
+product: smartbuy
+version: "1.0"
+
+# Default model when no task_type matched
+default_model: "qwen3:8b"
+default_timeout: 30
+
+# Task → model mapping
+tasks:
+  # Simple tasks (qwen2.5:1.5b — fast, ≤5s)
+  query_intent:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 100
+    description: "Classify user shopping intent"
+
+  product_categorization:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 50
+    description: "Categorize product into taxonomy"
+
+  review_spam_check:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 30
+    description: "Detect fake/spam reviews"
+
+  # Medium tasks (qwen2.5:7b — balanced, ≤15s)
+  comparison_text:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 500
+    description: "Generate product comparison text"
+
+  review_summary:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 400
+    description: "Summarize product reviews"
+
+  recommendation:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 500
+    description: "Generate product recommendations"
+
+  seo_description:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 300
+    description: "Generate SEO product description"
+
+  # No complex/thinking tasks for SmartBuy
+  # (shopping doesn't require deep reasoning)
+
+# Hybrid engine trust levels
+hybrid_rules:
+  pricing: rule_only          # Price data always from APIs
+  ranking: rule_primary       # Rule engine ranks, AI validates
+  comparison_text: ai_only    # AI generates comparison text
+  categorization: ai_primary  # AI categorizes, rule validates
+
+# Cache TTLs per task
+cache_ttl:
+  query_intent: 86400         # 24h — intents are stable
+  product_categorization: 604800  # 7d — categories don't change
+  comparison_text: 14400      # 4h — prices may change
+  review_summary: 28800       # 8h — reviews accumulate slowly
+  recommendation: 7200        # 2h — context-dependent

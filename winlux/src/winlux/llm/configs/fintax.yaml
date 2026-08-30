@@ -1,0 +1,68 @@
+# FinTax AI — Model routing configuration
+# Maps task_type → model selection rules
+
+product: fintax
+version: "1.0"
+
+default_model: "qwen3:8b"
+default_timeout: 30
+
+tasks:
+  # Simple tasks (qwen2.5:1.5b)
+  deduction_validation:
+    complexity: simple
+    model: "qwen2.5:1.5b"
+    timeout: 5
+    max_tokens: 50
+    description: "Validate if expense qualifies as tax deduction"
+
+  # Medium tasks (qwen2.5:7b)
+  income_classification:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 200
+    description: "Classify income source type (salary, freelance, rental)"
+
+  document_extraction:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 500
+    description: "Extract structured data from tax documents/receipts"
+
+  anomaly_detection:
+    complexity: medium
+    model: "qwen2.5:7b"
+    timeout: 15
+    max_tokens: 300
+    description: "Detect unusual fees in Shopee/Lazada seller data"
+
+  # Complex tasks (qwen3:8b)
+  tax_explanation:
+    complexity: complex
+    model: "qwen3:8b"
+    timeout: 30
+    max_tokens: 800
+    description: "Explain tax rules in plain Vietnamese"
+
+# Hybrid engine trust levels
+hybrid_rules:
+  calculation: rule_only        # ALL math by rule engine (never AI)
+  classification: rule_primary  # Rule classifies, AI validates edge cases
+  explanation: ai_only          # AI explains (not calculates)
+  bracket_lookup: rule_only     # Tax brackets always from DB
+
+# Safety: sensitivity routing
+sensitivity:
+  income_classification: high    # Contains financial data → Ollama only
+  document_extraction: high      # Contains PII → Ollama only
+  tax_explanation: medium        # General info, sanitized OK
+  anomaly_detection: high        # Contains transaction data → Ollama only
+
+# Cache TTLs
+cache_ttl:
+  deduction_validation: 604800   # 7d — tax rules are stable within year
+  income_classification: 0       # Never cache (user-specific)
+  tax_explanation: 86400         # 24h — explanations are stable
+  document_extraction: 0         # Never cache (user-specific)
