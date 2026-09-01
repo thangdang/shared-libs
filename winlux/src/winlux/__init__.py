@@ -160,6 +160,27 @@ from winlux.linker import (
     generate_affiliate_link,
 )
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SPEECH MODULE — ASR and TTS for Vietnamese
+# ═══════════════════════════════════════════════════════════════════════════════
+
+from winlux.speech import (
+    # ASR
+    transcribe,
+    transcribe_file,
+    transcribe_stream,
+    ASRResult,
+    ASRConfig,
+    WhisperASR,
+    # TTS
+    speak,
+    speak_to_file,
+    get_available_voices,
+    VoiceRegion,
+    TTSConfig,
+    EdgeTTS,
+)
+
 __all__ = [
     # NLP
     "segment",
@@ -242,4 +263,17 @@ __all__ = [
     "ProductLinker",
     "detect_products",
     "generate_affiliate_link",
+    # Speech
+    "transcribe",
+    "transcribe_file",
+    "transcribe_stream",
+    "ASRResult",
+    "ASRConfig",
+    "WhisperASR",
+    "speak",
+    "speak_to_file",
+    "get_available_voices",
+    "VoiceRegion",
+    "TTSConfig",
+    "EdgeTTS",
 ]
