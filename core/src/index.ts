@@ -224,3 +224,57 @@ export * from './clients/cross-product-links.js';
 
 export * from './resilience/services/offlineResilience.js';
 export * from './resilience/services/emergencyDetector.js';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AFFILIATE MODULE — Affiliate marketing integration (Shopee, Lazada, Tiki, etc.)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export {
+  // Service
+  AffiliateService,
+  createAffiliateService,
+  // Repository
+  MongoAffiliateRepository,
+  // Matcher
+  detectCategory,
+  getBestPlatform,
+  getCommissionRate,
+  calculateExpectedCommission,
+  matchContent,
+  // Link Generator
+  generateAffiliateLink,
+  generateTrackingId,
+  generateMultiPlatformLinks,
+  buildRedirectUrl,
+  parsePostback,
+  // Tracker
+  hashUserIdentifier,
+  createClickRecord,
+  calculateConversionRate,
+  aggregateClickStats,
+  groupStatsByPlatform,
+  groupStatsByApp,
+  isDuplicateClick,
+  // Constants
+  CATEGORY_PATTERNS,
+  PLATFORM_COMMISSION,
+  APP_PLATFORM_PRIORITY,
+  PLATFORM_URLS,
+} from './affiliate/index.js';
+
+export type {
+  Platform,
+  Category,
+  AppName,
+  AffiliateAccount,
+  AffiliateLink,
+  AffiliateClick,
+  AffiliateMatch,
+  MatchRequest,
+  AffiliateStats,
+  IAffiliateRepository,
+  MatchResult,
+  MultiPlatformLinks,
+  PostbackData,
+  AggregatedStats,
+} from './affiliate/index.js';
