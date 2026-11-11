@@ -1,0 +1,49 @@
+{
+  "name": "@shared/affiliate-service",
+  "version": "1.0.0",
+  "description": "Affiliate link management and tracking service for Vietnam e-commerce platforms",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./angular": {
+      "import": "./dist/angular/index.mjs",
+      "require": "./dist/angular/index.js",
+      "types": "./dist/angular/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/angular/index.ts --format cjs,esm --dts",
+    "lint": "eslint src/",
+    "test": "vitest"
+  },
+  "keywords": [
+    "affiliate",
+    "shopee",
+    "lazada",
+    "tiki",
+    "vietnam",
+    "ecommerce",
+    "tracking"
+  ],
+  "peerDependencies": {
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0",
+    "rxjs": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@angular/common": { "optional": true },
+    "@angular/core": { "optional": true },
+    "rxjs": { "optional": true }
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsup": "^8.0.0",
+    "vitest": "^1.0.0"
+  }
+}

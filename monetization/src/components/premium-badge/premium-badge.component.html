@@ -1,0 +1,8 @@
+<span 
+  class="premium-badge"
+  [ngClass]="[tier, variant]"
+  [title]="getTierLabel()"
+>
+  <span class="badge-icon">{{ getTierIcon() }}</span>
+  <span *ngIf="variant !== 'icon-only'" class="badge-text">{{ getTierLabel() }}</span>
+</span>

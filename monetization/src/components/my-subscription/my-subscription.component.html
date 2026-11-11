@@ -1,0 +1,179 @@
+<div class="subscription-page">
+  <h1>Gói đăng ký của tôi</h1>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- No Subscription -->
+  <div *ngIf="!loading && !subscription" class="no-subscription">
+    <div class="empty-icon">📦</div>
+    <h2>Bạn chưa có gói đăng ký</h2>
+    <p>Nâng cấp để sử dụng đầy đủ tính năng</p>
+    <button class="btn btn-primary" (click)="upgrade.emit()">
+      Xem các gói
+    </button>
+  </div>
+
+  <!-- Subscription Details -->
+  <div *ngIf="!loading && subscription" class="subscription-details">
+    <!-- Status Card -->
+    <div class="status-card" [ngClass]="subscription.status">
+      <div class="status-header">
+        <div class="tier-info">
+          <h2>{{ subscription.tier.name }}</h2>
+          <span class="status-badge" [ngClass]="subscription.status">
+            {{ getStatusLabel(subscription.status) }}
+          </span>
+        </div>
+        <div *ngIf="subscription.status === 'active'" class="expiry-info">
+          <span class="label">Còn lại</span>
+          <span class="value">{{ getDaysRemaining() }} ngày</span>
+        </div>
+      </div>
+
+      <div class="dates-row">
+        <div class="date-item">
+          <span class="label">Ngày bắt đầu</span>
+          <span class="value">{{ formatDate(subscription.start_date) }}</span>
+        </div>
+        <div class="date-item">
+          <span class="label">Ngày hết hạn</span>
+          <span class="value">{{ formatDate(subscription.end_date) }}</span>
+        </div>
+        <div *ngIf="subscription.next_billing_date" class="date-item">
+          <span class="label">Gia hạn tiếp theo</span>
+          <span class="value">{{ formatDate(subscription.next_billing_date) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-card">
+      <h3>Tính năng gói của bạn</h3>
+      <ul class="feature-list">
+        <li *ngFor="let feature of subscription.tier.features">
+          <span class="check">✓</span>
+          {{ feature }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Usage -->
+    <div *ngIf="subscription.usage" class="usage-card">
+      <h3>Sử dụng trong tháng</h3>
+      
+      <div *ngIf="subscription.usage.api_calls" class="usage-item">
+        <div class="usage-header">
+          <span>API Calls</span>
+          <span>{{ subscription.usage.api_calls.used | number }} / {{ subscription.usage.api_calls.limit | number }}</span>
+        </div>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill"
+            [style.width.%]="getUsagePercent(subscription.usage.api_calls)"
+            [class.warning]="getUsagePercent(subscription.usage.api_calls) > 80"
+          ></div>
+        </div>
+      </div>
+
+      <div *ngIf="subscription.usage.storage" class="usage-item">
+        <div class="usage-header">
+          <span>Dung lượng lưu trữ</span>
+          <span>{{ formatBytes(subscription.usage.storage.used) }} / {{ formatBytes(subscription.usage.storage.limit) }}</span>
+        </div>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill"
+            [style.width.%]="getUsagePercent(subscription.usage.storage)"
+            [class.warning]="getUsagePercent(subscription.usage.storage) > 80"
+          ></div>
+        </div>
+      </div>
+
+      <div *ngIf="subscription.usage.exports" class="usage-item">
+        <div class="usage-header">
+          <span>Xuất dữ liệu</span>
+          <span>{{ subscription.usage.exports.used }} / {{ subscription.usage.exports.limit }}</span>
+        </div>
+        <div class="progress-bar">
+          <div 
+            class="progress-fill"
+            [style.width.%]="getUsagePercent(subscription.usage.exports)"
+            [class.warning]="getUsagePercent(subscription.usage.exports) > 80"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-card">
+      <h3>Quản lý gói</h3>
+      
+      <div class="action-row">
+        <div class="action-info">
+          <strong>Tự động gia hạn</strong>
+          <span>{{ subscription.auto_renew ? 'Đang bật' : 'Đã tắt' }}</span>
+        </div>
+        <button 
+          class="btn btn-secondary"
+          (click)="toggleAutoRenew()"
+        >
+          {{ subscription.auto_renew ? 'Tắt' : 'Bật' }}
+        </button>
+      </div>
+
+      <div class="action-row">
+        <div class="action-info">
+          <strong>Phương thức thanh toán</strong>
+          <span>{{ subscription.payment_method || 'Chưa thiết lập' }}</span>
+        </div>
+        <button class="btn btn-secondary" (click)="managePayment.emit()">
+          Cập nhật
+        </button>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" (click)="upgrade.emit()">
+          Nâng cấp gói
+        </button>
+        <button 
+          *ngIf="subscription.status === 'active'"
+          class="btn btn-danger"
+          (click)="confirmCancel()"
+        >
+          Hủy đăng ký
+        </button>
+      </div>
+    </div>
+
+    <!-- Payment History Link -->
+    <div class="history-link">
+      <a href="#" (click)="viewHistory.emit(); $event.preventDefault()">
+        Xem lịch sử thanh toán →
+      </a>
+    </div>
+  </div>
+
+  <!-- Cancel Confirmation Modal -->
+  <div *ngIf="showCancelModal" class="modal-overlay" (click)="showCancelModal = false">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Xác nhận hủy đăng ký</h3>
+      <p>Bạn có chắc muốn hủy gói {{ subscription?.tier?.name }}?</p>
+      <p class="warning-text">
+        Gói sẽ vẫn hoạt động đến ngày {{ formatDate(subscription?.end_date || '') }}.  
+        Sau đó bạn sẽ mất quyền truy cập các tính năng premium.
+      </p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="showCancelModal = false">
+          Giữ gói
+        </button>
+        <button class="btn btn-danger" (click)="cancelSubscription()">
+          Xác nhận hủy
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

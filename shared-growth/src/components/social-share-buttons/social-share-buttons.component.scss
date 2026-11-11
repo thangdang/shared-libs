@@ -1,0 +1,259 @@
+/**
+ * Social Share Buttons Styles
+ * Task: GRW-016
+ * Vietnamese market: Zalo priority, mobile-first
+ */
+
+.social-share {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  // Layout variants
+  &.horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .share-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+    }
+  }
+
+  &.vertical {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .share-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .share-btn {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  &.compact {
+    gap: 4px;
+
+    .share-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .share-btn {
+      padding: 8px;
+      border-radius: 50%;
+
+      .btn-icon {
+        margin: 0;
+      }
+    }
+  }
+
+  // Size variants
+  &.size-small {
+    .share-btn {
+      padding: 6px 10px;
+      font-size: 12px;
+
+      .btn-icon {
+        font-size: 14px;
+        
+        .zalo-svg {
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+
+    &.compact .share-btn {
+      padding: 6px;
+    }
+  }
+
+  &.size-medium {
+    .share-btn {
+      padding: 8px 14px;
+      font-size: 14px;
+
+      .btn-icon {
+        font-size: 16px;
+        
+        .zalo-svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    &.compact .share-btn {
+      padding: 10px;
+    }
+  }
+
+  &.size-large {
+    .share-btn {
+      padding: 12px 20px;
+      font-size: 16px;
+
+      .btn-icon {
+        font-size: 20px;
+        
+        .zalo-svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    &.compact .share-btn {
+      padding: 14px;
+    }
+  }
+}
+
+.share-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  white-space: nowrap;
+}
+
+.share-buttons {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--btn-color);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: var(--btn-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--btn-color), 0.3);
+  }
+
+  &.copied {
+    background-color: #28a745 !important;
+
+    .btn-icon i:not(.copied-icon) {
+      display: none;
+    }
+
+    .copied-icon {
+      display: inline-block !important;
+      animation: checkPop 0.3s ease;
+    }
+  }
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+
+  .zalo-svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .copied-icon {
+    display: none;
+  }
+}
+
+.btn-label {
+  line-height: 1.2;
+}
+
+// Animations
+@keyframes checkPop {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Mobile responsive
+@media (max-width: 480px) {
+  .social-share {
+    &.horizontal {
+      flex-direction: column;
+      align-items: stretch;
+
+      .share-buttons {
+        justify-content: center;
+      }
+    }
+
+    .share-label {
+      text-align: center;
+      width: 100%;
+    }
+  }
+
+  .share-btn {
+    flex: 1;
+    min-width: 0;
+
+    .btn-label {
+      display: none;
+    }
+  }
+
+  .social-share:not(.compact) .share-btn {
+    padding: 10px;
+    border-radius: 50%;
+
+    .btn-icon {
+      margin: 0;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .share-label {
+    color: #aaa;
+  }
+
+  .share-btn {
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  }
+}

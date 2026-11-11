@@ -1,0 +1,76 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" aria-labelledby="share-modal-title">
+    <div class="modal-content">
+      <!-- Header -->
+      <div class="modal-header">
+        <h2 id="share-modal-title" class="modal-title">Chia sẻ</h2>
+        <button 
+          type="button" 
+          class="close-btn" 
+          (click)="close()"
+          aria-label="Đóng">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <!-- Share preview -->
+        <div class="share-preview">
+          <h3 class="preview-title">{{ shareOptions.title }}</h3>
+          <p class="preview-text">{{ shareOptions.text }}</p>
+          
+          @if (showReferralCode && shareOptions.referralCode) {
+            <div class="referral-code">
+              <span class="label">Mã giới thiệu:</span>
+              <span class="code">{{ shareOptions.referralCode }}</span>
+            </div>
+          }
+
+          <div class="share-url">
+            <input 
+              type="text" 
+              [value]="shareUrl" 
+              readonly 
+              class="url-input"
+              aria-label="Link chia sẻ">
+            <button 
+              type="button" 
+              class="copy-btn"
+              (click)="share('copy')"
+              [class.copied]="copied">
+              <i [class]="getPlatformIcon('copy')"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Share platforms -->
+        <div class="platforms-grid">
+          @for (platform of platforms; track platform) {
+            @if (platform !== 'copy') {
+              <button 
+                type="button"
+                class="platform-btn"
+                [style.--platform-color]="getPlatformColor(platform)"
+                (click)="share(platform)"
+                [attr.aria-label]="'Chia sẻ qua ' + getPlatformName(platform)">
+                <span class="platform-icon">
+                  <i [class]="getPlatformIcon(platform)"></i>
+                </span>
+                <span class="platform-name">{{ getPlatformName(platform) }}</span>
+              </button>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <p class="footer-text">
+          <i class="fas fa-gift"></i>
+          Mời bạn bè đăng ký để nhận thưởng Premium miễn phí!
+        </p>
+      </div>
+    </div>
+  </div>
+}

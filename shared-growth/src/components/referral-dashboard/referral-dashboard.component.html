@@ -1,0 +1,175 @@
+<div class="referral-dashboard">
+  @if (referralStats(); as stats) {
+    <!-- Header with referral code -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <h2 class="header-title">Giới thiệu bạn bè</h2>
+        <p class="header-subtitle">
+          Mời bạn bè sử dụng {{ appName }} và nhận {{ rewardDaysPerReferral }} ngày Premium miễn phí!
+        </p>
+      </div>
+      
+      <div class="referral-code-box">
+        <span class="label">Mã giới thiệu của bạn</span>
+        <div class="code-wrapper">
+          <span class="code">{{ stats.referralCode }}</span>
+          <button 
+            type="button" 
+            class="copy-btn"
+            [class.copied]="copied()"
+            (click)="copyReferralCode()"
+            aria-label="Sao chép mã giới thiệu">
+            @if (copied()) {
+              <i class="fas fa-check"></i>
+            } @else {
+              <i class="fas fa-copy"></i>
+            }
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="share-btn" (click)="openShareModal()">
+        <i class="fas fa-share-alt"></i>
+        Chia sẻ ngay
+      </button>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalReferrals }}</span>
+          <span class="stat-label">Lời mời đã gửi</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.successfulReferrals }}</span>
+          <span class="stat-label">Đăng ký thành công</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon yellow">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.pendingReferrals }}</span>
+          <span class="stat-label">Đang chờ</span>
+        </div>
+      </div>
+
+      <div class="stat-card highlight">
+        <div class="stat-icon purple">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalRewardsEarned }} ngày</span>
+          <span class="stat-label">Premium đã nhận</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conversion rate -->
+    <div class="conversion-section">
+      <div class="conversion-header">
+        <span class="conversion-label">Tỷ lệ chuyển đổi</span>
+        <span class="conversion-value">{{ completionRate() }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div 
+          class="progress-fill" 
+          [style.width.%]="completionRate()"
+          role="progressbar"
+          [attr.aria-valuenow]="completionRate()"
+          aria-valuemin="0"
+          aria-valuemax="100">
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent referrals -->
+    @if (recentReferrals().length > 0) {
+      <div class="referrals-section">
+        <h3 class="section-title">Lịch sử giới thiệu</h3>
+        
+        <div class="referrals-list">
+          @for (referral of recentReferrals(); track referral.referralId) {
+            <div class="referral-item" (click)="viewReferralDetails(referral.referralId)">
+              <div class="referral-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="referral-info">
+                <span class="referral-email">{{ maskEmail(referral.referredEmail) }}</span>
+                <span class="referral-date">{{ formatDate(referral.createdAt) }}</span>
+              </div>
+              <div class="referral-status">
+                <span class="status-badge" [ngClass]="getStatusClass(referral.status)">
+                  {{ getStatusLabel(referral.status) }}
+                </span>
+                @if (referral.status === 'completed') {
+                  <span class="reward-badge">+{{ referral.rewardDays }} ngày</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-user-friends"></i>
+        </div>
+        <h3 class="empty-title">Chưa có lời mời nào</h3>
+        <p class="empty-text">Chia sẻ mã giới thiệu để bắt đầu nhận thưởng!</p>
+      </div>
+    }
+
+    <!-- How it works -->
+    <div class="how-it-works">
+      <h3 class="section-title">Cách thức hoạt động</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <span class="step-title">Chia sẻ mã</span>
+            <span class="step-desc">Gửi mã giới thiệu cho bạn bè</span>
+          </div>
+        </div>
+        <div class="step-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <span class="step-title">Bạn bè đăng ký</span>
+            <span class="step-desc">Sử dụng mã khi tạo tài khoản</span>
+          </div>
+        </div>
+        <div class="step-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <span class="step-title">Nhận thưởng</span>
+            <span class="step-desc">Cả hai cùng được Premium miễn phí</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Loading state -->
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Đang tải...</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,51 @@
+{
+  "name": "@shared/analytics-service",
+  "version": "1.0.0",
+  "description": "Shared Google Analytics 4 service library for Nov 2026 release - All 5 AI apps",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./angular": {
+      "types": "./dist/angular/index.d.ts",
+      "default": "./dist/angular/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest"
+  },
+  "keywords": [
+    "analytics",
+    "ga4",
+    "google-analytics",
+    "nov2026",
+    "trendbrief",
+    "smartbuy",
+    "fintax",
+    "doctorcar",
+    "caremate"
+  ],
+  "author": "Solo Dev",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "@angular/core": ">=17.0.0",
+    "@angular/router": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/router": {
+      "optional": true
+    }
+  }
+}

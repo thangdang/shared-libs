@@ -1,0 +1,169 @@
+<div class="pricing-page">
+  <header class="pricing-header">
+    <h1>Chọn gói phù hợp với bạn</h1>
+    <p>Bắt đầu miễn phí, nâng cấp khi cần</p>
+    
+    <div class="billing-toggle">
+      <button 
+        [class.active]="billingPeriod() === 'monthly'"
+        (click)="billingPeriod.set('monthly')">
+        Hàng tháng
+      </button>
+      <button 
+        [class.active]="billingPeriod() === 'yearly'"
+        (click)="billingPeriod.set('yearly')">
+        Hàng năm
+        <span class="discount-badge">-17%</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="pricing-cards">
+    @for (tier of displayTiers(); track tier.id) {
+      <div 
+        class="pricing-card"
+        [class.popular]="tier.id === 'premium'"
+        [class.current]="currentTierId() === tier.id">
+        
+        @if (tier.id === 'premium') {
+          <div class="popular-badge">Phổ biến nhất</div>
+        }
+        
+        <div class="card-header">
+          <h2>{{ tier.nameVi }}</h2>
+          <div class="price">
+            @if (tier.price === 0) {
+              <span class="amount">Miễn phí</span>
+            } @else {
+              <span class="amount">{{ formatPrice(tier.price) }}</span>
+              <span class="period">/{{ tier.period === 'yearly' ? 'năm' : 'tháng' }}</span>
+            }
+          </div>
+        </div>
+        
+        <ul class="features">
+          @for (feature of tier.featuresVi; track feature) {
+            <li>
+              <svg class="check-icon" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              {{ feature }}
+            </li>
+          }
+        </ul>
+        
+        <div class="limits">
+          @if (tier.limits.dailyQueries !== -1) {
+            <span>{{ tier.limits.dailyQueries }} truy vấn/ngày</span>
+          } @else {
+            <span>Không giới hạn truy vấn</span>
+          }
+        </div>
+        
+        <button 
+          class="subscribe-btn"
+          [class.current]="currentTierId() === tier.id"
+          [disabled]="isLoading() || currentTierId() === tier.id"
+          (click)="selectTier(tier)">
+          @if (currentTierId() === tier.id) {
+            Gói hiện tại
+          } @else if (tier.price === 0) {
+            Bắt đầu miễn phí
+          } @else if (isUpgrade(tier)) {
+            Nâng cấp
+          } @else {
+            Chọn gói này
+          }
+        </button>
+      </div>
+    }
+  </div>
+
+  <section class="feature-comparison">
+    <h2>So sánh chi tiết các gói</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tính năng</th>
+          @for (tier of displayTiers(); track tier.id) {
+            <th>{{ tier.nameVi }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Truy vấn hàng ngày</td>
+          @for (tier of displayTiers(); track tier.id) {
+            <td>
+              {{ tier.limits.dailyQueries === -1 ? 'Không giới hạn' : tier.limits.dailyQueries }}
+            </td>
+          }
+        </tr>
+        <tr>
+          <td>Báo cáo hàng tháng</td>
+          @for (tier of displayTiers(); track tier.id) {
+            <td>
+              {{ tier.limits.monthlyReports === -1 ? 'Không giới hạn' : tier.limits.monthlyReports }}
+            </td>
+          }
+        </tr>
+        <tr>
+          <td>Dung lượng lưu trữ</td>
+          @for (tier of displayTiers(); track tier.id) {
+            <td>{{ tier.limits.storageGb }} GB</td>
+          }
+        </tr>
+        <tr>
+          <td>Không quảng cáo</td>
+          @for (tier of displayTiers(); track tier.id) {
+            <td>
+              @if (tier.adFree) {
+                <svg class="check-icon green" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+              } @else {
+                <svg class="x-icon" viewBox="0 0 24 24">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              }
+            </td>
+          }
+        </tr>
+        <tr>
+          <td>Hỗ trợ ưu tiên</td>
+          @for (tier of displayTiers(); track tier.id) {
+            <td>
+              @if (tier.priority >= 2) {
+                <svg class="check-icon green" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+              } @else {
+                <svg class="x-icon" viewBox="0 0 24 24">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              }
+            </td>
+          }
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="faq">
+    <h2>Câu hỏi thường gặp</h2>
+    <div class="faq-items">
+      <details>
+        <summary>Tôi có thể hủy bất cứ lúc nào không?</summary>
+        <p>Có, bạn có thể hủy đăng ký bất cứ lúc nào.  Gói của bạn sẽ tiếp tục hoạt động đến hết chu kỳ thanh toán hiện tại.</p>
+      </details>
+      <details>
+        <summary>Phương thức thanh toán nào được hỗ trợ?</summary>
+        <p>Chúng tôi hỗ trợ thanh toán qua VNPay, MoMo, và các thẻ ngân hàng nội địa.</p>
+      </details>
+      <details>
+        <summary>Tôi có thể nâng cấp hoặc hạ cấp gói không?</summary>
+        <p>Có, bạn có thể thay đổi gói bất cứ lúc nào.  Khi nâng cấp, bạn sẽ được tính theo tỷ lệ thời gian còn lại.  Khi hạ cấp, thay đổi sẽ có hiệu lực vào đầu chu kỳ tiếp theo.</p>
+      </details>
+    </div>
+  </section>
+</div>

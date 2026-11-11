@@ -1,0 +1,287 @@
+// Rarity colors
+$rarity-colors: (
+  common: #9ca3af,
+  uncommon: #22c55e,
+  rare: #3b82f6,
+  epic: #a855f7,
+  legendary: #f59e0b
+);
+
+.achievement-badge {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  // Size variants
+  &.small {
+    padding: 0.5rem;
+    gap: 0.5rem;
+
+    .badge-icon-wrapper {
+      width: 40px;
+      height: 40px;
+    }
+
+    .badge-icon {
+      font-size: 1rem;
+    }
+
+    .badge-name {
+      font-size: 0.75rem;
+    }
+  }
+
+  &.medium {
+    .badge-icon-wrapper {
+      width: 56px;
+      height: 56px;
+    }
+
+    .badge-icon {
+      font-size: 1.25rem;
+    }
+  }
+
+  &.large {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+
+    .badge-icon-wrapper {
+      width: 80px;
+      height: 80px;
+    }
+
+    .badge-icon {
+      font-size: 2rem;
+    }
+
+    .badge-details {
+      align-items: center;
+    }
+  }
+
+  // States
+  &.locked {
+    opacity: 0.7;
+
+    .badge-icon-wrapper {
+      filter: grayscale(100%);
+    }
+
+    .badge-name {
+      color: #6b7280;
+    }
+  }
+
+  &.unlocked.animated {
+    &:hover .badge-glow {
+      opacity: 0.5;
+    }
+  }
+
+  // Rarity-specific borders
+  @each $rarity, $color in $rarity-colors {
+    &[data-rarity='#{$rarity}'].unlocked {
+      border-color: $color;
+      
+      .badge-glow {
+        background: radial-gradient(circle, $color 0%, transparent 70%);
+      }
+
+      .badge-icon-wrapper::before {
+        border-color: $color;
+      }
+    }
+  }
+}
+
+.badge-icon-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid #e5e7eb;
+    border-radius: 50%;
+    transition: all 0.3s;
+  }
+}
+
+.badge-glow {
+  position: absolute;
+  inset: -20%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.badge-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 50%;
+  color: #374151;
+  z-index: 1;
+
+  .unlocked & {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    color: #b45309;
+  }
+}
+
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  color: white;
+  font-size: 0.875rem;
+  z-index: 2;
+}
+
+.progress-ring {
+  position: absolute;
+  inset: -3px;
+  transform: rotate(-90deg);
+
+  .progress-ring-bg {
+    stroke: #e5e7eb;
+  }
+
+  .progress-ring-fill {
+    stroke: #3b82f6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+}
+
+.badge-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.badge-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.unlock-date {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.625rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.progress-text {
+  font-size: 0.625rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.requirement-text {
+  font-size: 0.625rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.badge-reward {
+  margin-top: 0.5rem;
+}
+
+.reward-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #92400e;
+
+  i {
+    font-size: 0.625rem;
+  }
+}
+
+.rarity-indicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  
+  @each $rarity, $color in $rarity-colors {
+    &[data-rarity='#{$rarity}'] {
+      background: rgba($color, 0.15);
+      color: $color;
+    }
+  }
+}
+
+// Animation for newly unlocked
+@keyframes unlockPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.achievement-badge.unlocked.animated .badge-icon-wrapper {
+  animation: unlockPulse 2s ease-in-out infinite;
+}

@@ -1,0 +1,169 @@
+# SHARED-005:  Environment Template (No AI Version)
+# Nov 2026 Release - AI features disabled
+# Copy this file to .env in each app's root directory
+
+# =============================================================================
+# GENERAL SETTINGS
+# =============================================================================
+NODE_ENV=production
+PORT=3000
+LOG_LEVEL=info
+
+# =============================================================================
+# DATABASE
+# =============================================================================
+MONGODB_URI=mongodb://localhost:27017/appname
+REDIS_URL=redis://localhost:6379
+
+# =============================================================================
+# AI FEATURES - ALL DISABLED FOR NOV 2026 LAUNCH
+# =============================================================================
+AI_ENABLED=false
+
+# TrendBrief AI Features
+FEATURE_AI_SUMMARIZE_URL=false
+FEATURE_AI_BRIEFING=false
+FEATURE_AI_TTS=false
+
+# SmartBuy AI Features
+FEATURE_AI_QUERY=false
+FEATURE_AI_QUERY_STREAM=false
+FEATURE_AI_QUERY_VOICE=false
+
+# FinTax AI Features
+FEATURE_AI_CHAT=false
+FEATURE_AI_CHAT_STREAM=false
+FEATURE_AI_TAX_ADVISOR=false
+
+# DoctorCar AI Features
+FEATURE_AI_DIAGNOSIS_ANALYZE=false
+FEATURE_AI_DIAGNOSIS_QUICK=false
+FEATURE_AI_IMAGE_ANALYSIS=false
+
+# CareMate AI Features
+FEATURE_AI_CHECK_SYMPTOMS=false
+FEATURE_AI_SUGGEST_DRUGS=false
+FEATURE_AI_EMERGENCY_DETECTION=false
+
+# =============================================================================
+# NON-AI FEATURES - ALL ENABLED
+# =============================================================================
+
+# TrendBrief Non-AI
+FEATURE_RSS_HEADLINES=true
+FEATURE_TRENDING_TOPICS=true
+FEATURE_BREAKING_NEWS=true
+
+# SmartBuy Non-AI
+FEATURE_FLASH_SALES=true
+FEATURE_PRICE_TRACKING=true
+FEATURE_REVIEW_SUMMARIES=true
+FEATURE_SIMILAR_PRODUCTS=true
+FEATURE_AFFILIATE_LINKS=true
+
+# FinTax Non-AI
+FEATURE_RULE_BASED_CLASSIFIER=true
+FEATURE_Z_SCORE_ANOMALY=true
+FEATURE_TESSERACT_OCR=true
+FEATURE_FAQ_STATIC=true
+FEATURE_TAX_CALCULATOR=true
+
+# DoctorCar Non-AI
+FEATURE_DTC_DATABASE=true
+FEATURE_MAINTENANCE_SCHEDULES=true
+FEATURE_CAR_ARTICLES=true
+FEATURE_FORUM_SEARCH=true
+
+# CareMate Non-AI
+FEATURE_DRUG_DATABASE=true
+FEATURE_HEALTH_ARTICLES=true
+FEATURE_CONDITION_BROWSER=true
+FEATURE_DRUG_PRICES=true
+FEATURE_MEDICAL_DISCLAIMER=true
+FEATURE_EMERGENCY_INFO=true
+
+# =============================================================================
+# PREMIUM/MONETIZATION FEATURES
+# =============================================================================
+FEATURE_PREMIUM_SUBSCRIPTION=true
+FEATURE_AFFILIATE_LINKS=true
+FEATURE_AD_FREE=true
+
+# =============================================================================
+# PAYMENT GATEWAY CREDENTIALS (Replace with actual values)
+# =============================================================================
+
+# VNPay
+VNPAY_TMN_CODE=your_tmn_code
+VNPAY_HASH_SECRET=your_hash_secret
+VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+VNPAY_RETURN_URL=https://yourapp.com/payment/vnpay/return
+
+# MoMo
+MOMO_PARTNER_CODE=your_partner_code
+MOMO_ACCESS_KEY=your_access_key
+MOMO_SECRET_KEY=your_secret_key
+MOMO_ENDPOINT=https://test-payment.momo.vn/v2/gateway/api
+MOMO_IPN_URL=https://yourapp.com/payment/momo/ipn
+MOMO_REDIRECT_URL=https://yourapp.com/payment/momo/return
+
+# =============================================================================
+# AFFILIATE API KEYS (Replace with actual values)
+# =============================================================================
+SHOPEE_AFFILIATE_KEY=your_shopee_key
+SHOPEE_AFFILIATE_SECRET=your_shopee_secret
+LAZADA_AFFILIATE_KEY=your_lazada_key
+LAZADA_AFFILIATE_SECRET=your_lazada_secret
+TIKI_AFFILIATE_KEY=your_tiki_key
+
+# =============================================================================
+# SCHEDULER SETTINGS
+# =============================================================================
+
+# TrendBrief Schedulers
+SCHEDULER_HEADLINES_INTERVAL=15m
+SCHEDULER_QUICK_SUMMARY_INTERVAL=1h
+SCHEDULER_FULL_PROCESS_INTERVAL=24h
+
+# SmartBuy Schedulers
+SCHEDULER_PRICE_UPDATE_INTERVAL=6h
+SCHEDULER_PRODUCT_ANALYSIS_INTERVAL=7d
+
+# FinTax Schedulers
+SCHEDULER_TAX_UPDATE_INTERVAL=30d
+
+# DoctorCar Schedulers
+SCHEDULER_FORUM_SCRAPE_INTERVAL=7d
+SCHEDULER_DTC_UPDATE_INTERVAL=30d
+
+# CareMate Schedulers
+SCHEDULER_ARTICLE_SCRAPE_INTERVAL=7d
+SCHEDULER_DRUG_PRICE_INTERVAL=7d
+
+# =============================================================================
+# OCR SETTINGS (FinTax)
+# =============================================================================
+TESSERACT_LANG=vie+eng
+TESSERACT_OEM=3
+TESSERACT_PSM=6
+
+# =============================================================================
+# SAFETY SETTINGS (CareMate)
+# =============================================================================
+REQUIRE_CONFIDENCE_SCORE=true
+MIN_CONFIDENCE_SCORE=0.8
+SHOW_MEDICAL_DISCLAIMER=true
+
+# =============================================================================
+# CORS & SECURITY
+# =============================================================================
+CORS_ORIGINS=https://yourapp.com,https://www.yourapp.com
+JWT_SECRET=your_jwt_secret_here
+JWT_EXPIRES_IN=7d
+
+# =============================================================================
+# EXTERNAL SERVICES (Optional - for future AI enablement)
+# =============================================================================
+# Uncomment when enabling AI features
+# OPENAI_API_KEY=your_openai_key
+# GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials.json

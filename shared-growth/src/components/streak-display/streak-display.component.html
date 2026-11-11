@@ -1,0 +1,165 @@
+@if (data(); as streak) {
+  <div 
+    class="streak-display" 
+    [class.compact]="variant === 'compact'"
+    [class.full]="variant === 'full'"
+    [class.minimal]="variant === 'minimal'"
+    [class.at-risk]="streak.isAtRisk"
+    (click)="onStreakClick()"
+    role="button"
+    tabindex="0"
+    [attr.aria-label]="'Chuỗi ' + streak.currentStreak + ' ngày liên tiếp'"
+    (keydown.enter)="onStreakClick()"
+    (keydown.space)="onStreakClick()">
+    
+    <!-- Minimal variant -->
+    @if (variant === 'minimal') {
+      <div class="minimal-content">
+        <div class="fire-icon" [class.animated]="!streak.isAtRisk">
+          🔥
+        </div>
+        <span class="streak-count">{{ streak.currentStreak }}</span>
+      </div>
+    }
+
+    <!-- Compact variant -->
+    @if (variant === 'compact') {
+      <div class="compact-content">
+        <div class="streak-main">
+          <div class="fire-icon" [class.animated]="!streak.isAtRisk">
+            🔥
+          </div>
+          <div class="streak-info">
+            <span class="streak-count">{{ streak.currentStreak }} ngày</span>
+            <span class="streak-label">liên tiếp</span>
+          </div>
+        </div>
+
+        @if (streak.isAtRisk) {
+          <div class="at-risk-badge">
+            <i class="fas fa-exclamation-triangle"></i>
+            Sắp mất!
+          </div>
+        }
+
+        @if (showHistory && recentHistory().length > 0) {
+          <div class="history-mini">
+            @for (day of recentHistory(); track day.date) {
+              <div 
+                class="day-dot" 
+                [class.active]="day.isActive" 
+                [class.today]="isToday(day.date)"
+                [attr.aria-label]="getDayLabel(day.date) + (day.isActive ? ' - Đã hoàn thành' : ' - Chưa hoàn thành')">
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Full variant -->
+    @if (variant === 'full') {
+      <div class="full-content">
+        <!-- Header -->
+        <div class="streak-header">
+          <div class="fire-icon large" [class.animated]="!streak.isAtRisk">
+            🔥
+          </div>
+          <div class="streak-main-info">
+            <span class="current-streak">{{ streak.currentStreak }}</span>
+            <span class="streak-text">ngày liên tiếp</span>
+          </div>
+          @if (streak.isAtRisk) {
+            <div class="at-risk-alert">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>Hãy hoàn thành hôm nay để giữ chuỗi!</span>
+            </div>
+          }
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat">
+            <span class="stat-value">{{ streak.longestStreak }}</span>
+            <span class="stat-label">Kỷ lục</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value">{{ streak.nextMilestone }}</span>
+            <span class="stat-label">Cột mốc tiếp theo</span>
+          </div>
+        </div>
+
+        <!-- Progress to milestone -->
+        <div class="milestone-progress">
+          <div class="progress-header">
+            <span class="progress-label">Tiến độ đến {{ streak.nextMilestone }} ngày</span>
+            <span class="progress-value">{{ streak.currentStreak }}/{{ streak.nextMilestone }}</span>
+          </div>
+          <div class="progress-bar">
+            <div 
+              class="progress-fill" 
+              [style.width.%]="progressToMilestone()"
+              role="progressbar"
+              [attr.aria-valuenow]="progressToMilestone()"
+              aria-valuemin="0"
+              aria-valuemax="100">
+            </div>
+          </div>
+          @if (streak.milestoneReward) {
+            <div class="reward-preview">
+              <i class="fas fa-gift"></i>
+              @if (streak.milestoneReward.type === 'premium_days') {
+                <span>+{{ streak.milestoneReward.value }} ngày Premium</span>
+              } @else {
+                <span>Huy hiệu đặc biệt</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Weekly history -->
+        @if (showHistory && recentHistory().length > 0) {
+          <div class="history-section">
+            <h4 class="history-title">7 ngày qua</h4>
+            <div class="history-grid">
+              @for (day of recentHistory(); track day.date) {
+                <div 
+                  class="day-item" 
+                  [class.active]="day.isActive" 
+                  [class.today]="isToday(day.date)">
+                  <span class="day-label">{{ getDayLabel(day.date) }}</span>
+                  <div class="day-indicator">
+                    @if (day.isActive) {
+                      <i class="fas fa-check"></i>
+                    } @else if (isToday(day.date)) {
+                      <i class="fas fa-circle"></i>
+                    } @else {
+                      <i class="fas fa-times"></i>
+                    }
+                  </div>
+                  <span class="day-date">{{ getDayNumber(day.date) }}</span>
+                  @if (day.bonusEarned) {
+                    <span class="bonus-badge">+{{ day.bonusEarned }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Last active -->
+        <div class="last-active">
+          <i class="fas fa-clock"></i>
+          <span>Hoạt động cuối: {{ formatDate(streak.lastActiveDate) }}</span>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <!-- Empty state -->
+  <div class="streak-empty">
+    <span class="empty-icon">🔥</span>
+    <span class="empty-text">Bắt đầu chuỗi ngày!</span>
+  </div>
+}

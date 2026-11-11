@@ -1,0 +1,174 @@
+<!-- FAQ Page Component -->
+<!-- Task: GRW-004 - Create FAQ pages (all apps) -->
+
+<div class="faq-page">
+  <!-- Schema.org FAQPage markup for SEO -->
+  <script type="application/ld+json" [innerHTML]="schemaMarkup"></script>
+
+  <!-- Header -->
+  <header class="faq-header">
+    <h1 class="faq-title">Câu hỏi thường gặp</h1>
+    <p class="faq-subtitle">
+      Tìm câu trả lời cho các thắc mắc về {{ appName }}
+    </p>
+  </header>
+
+  <!-- Search Bar -->
+  <div class="faq-search" *ngIf="showSearch">
+    <div class="search-wrapper">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Tìm kiếm câu hỏi..."
+        class="search-input"
+        aria-label="Tìm kiếm FAQ">
+      <button 
+        *ngIf="searchQuery" 
+        class="clear-btn"
+        (click)="searchQuery = ''; onSearch()"
+        aria-label="Xóa tìm kiếm">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="search-stats" *ngIf="searchQuery">
+      Tìm thấy <strong>{{ filteredFaqs.length }}</strong> kết quả
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="faq-categories" *ngIf="showCategories && categories.length > 0">
+    <button 
+      class="category-btn"
+      [class.active]="selectedCategory === 'all'"
+      (click)="onCategoryChange('all')">
+      <i class="fas fa-th-large"></i>
+      Tất cả
+      <span class="count">{{ getCategoryCount('all') }}</span>
+    </button>
+    
+    <button 
+      *ngFor="let category of categories; trackBy: trackByCategoryId"
+      class="category-btn"
+      [class.active]="selectedCategory === category.id"
+      (click)="onCategoryChange(category.id)">
+      <i [class]="category.icon || 'fas fa-folder'"></i>
+      {{ category.name }}
+      <span class="count">{{ getCategoryCount(category.id) }}</span>
+    </button>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="faq-actions">
+    <button class="action-btn" (click)="expandAll()">
+      <i class="fas fa-expand-arrows-alt"></i> Mở tất cả
+    </button>
+    <button class="action-btn" (click)="collapseAll()">
+      <i class="fas fa-compress-arrows-alt"></i> Đóng tất cả
+    </button>
+  </div>
+
+  <!-- FAQ List -->
+  <div class="faq-list" role="list">
+    <ng-container *ngIf="filteredFaqs.length > 0; else noResults">
+      <div 
+        *ngFor="let faq of filteredFaqs; trackBy: trackByFaqId"
+        class="faq-item"
+        [class.expanded]="isExpanded(faq.id)"
+        role="listitem">
+        
+        <!-- Question -->
+        <button 
+          class="faq-question"
+          [attr.aria-expanded]="isExpanded(faq.id)"
+          [attr.aria-controls]="'answer-' + faq.id"
+          (click)="toggleExpand(faq.id)">
+          <span class="question-text">{{ faq.question }}</span>
+          <i class="fas" [class.fa-chevron-down]="!isExpanded(faq.id)" [class.fa-chevron-up]="isExpanded(faq.id)"></i>
+        </button>
+
+        <!-- Answer -->
+        <div 
+          class="faq-answer"
+          [id]="'answer-' + faq.id"
+          [class.show]="isExpanded(faq.id)"
+          role="region"
+          [attr.aria-hidden]="!isExpanded(faq.id)">
+          
+          <!-- Answer Content (supports HTML) -->
+          <div class="answer-content" [innerHTML]="faq.answer"></div>
+
+          <!-- Tags -->
+          <div class="faq-tags" *ngIf="faq.tags?.length">
+            <span class="tag" *ngFor="let tag of faq.tags">{{ tag }}</span>
+          </div>
+
+          <!-- Related Links -->
+          <div class="faq-related" *ngIf="showRelatedLinks && faq.relatedLinks?.length">
+            <span class="related-label">Xem thêm:</span>
+            <a *ngFor="let link of faq.relatedLinks" 
+               [href]="link.url" 
+               class="related-link">
+              {{ link.label }}
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+
+          <!-- Feedback -->
+          <div class="faq-feedback" *ngIf="showFeedback">
+            <span class="feedback-label">Câu trả lời này có hữu ích không?</span>
+            <div class="feedback-buttons">
+              <button 
+                class="feedback-btn helpful"
+                (click)="onFeedback(faq.id, true)"
+                aria-label="Hữu ích">
+                <i class="fas fa-thumbs-up"></i>
+                <span *ngIf="faq.helpful">{{ faq.helpful }}</span>
+              </button>
+              <button 
+                class="feedback-btn not-helpful"
+                (click)="onFeedback(faq.id, false)"
+                aria-label="Không hữu ích">
+                <i class="fas fa-thumbs-down"></i>
+                <span *ngIf="faq.notHelpful">{{ faq.notHelpful }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Last Updated -->
+          <div class="faq-updated" *ngIf="faq.lastUpdated">
+            Cập nhật: {{ faq.lastUpdated }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- No Results -->
+    <ng-template #noResults>
+      <div class="no-results">
+        <i class="fas fa-search fa-3x"></i>
+        <h3>Không tìm thấy kết quả</h3>
+        <p>Thử tìm kiếm với từ khóa khác hoặc xem tất cả câu hỏi.</p>
+        <button class="btn-primary" (click)="searchQuery = ''; selectedCategory = 'all'; filterFaqs()">
+          Xem tất cả câu hỏi
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="faq-contact">
+    <div class="contact-content">
+      <i class="fas fa-headset contact-icon"></i>
+      <div class="contact-text">
+        <h3>{{ contactMessage }}</h3>
+        <p>Đội ngũ hỗ trợ sẵn sàng giúp đỡ bạn.</p>
+      </div>
+      <a [href]="'mailto:' + contactEmail" class="btn-contact">
+        <i class="fas fa-envelope"></i> Liên hệ hỗ trợ
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,99 @@
+<div 
+  class="achievement-badge"
+  [class.unlocked]="achievement.isUnlocked"
+  [class.locked]="!achievement.isUnlocked"
+  [class.animated]="animated && achievement.isUnlocked"
+  [class.small]="size === 'small'"
+  [class.medium]="size === 'medium'"
+  [class.large]="size === 'large'"
+  [attr.data-rarity]="achievement.rarity"
+  (click)="onBadgeClick()"
+  role="button"
+  tabindex="0"
+  [attr.aria-label]="achievement.name + (achievement.isUnlocked ? ' - Đã mở khóa' : ' - Chưa mở khóa')"
+  (keydown.enter)="onBadgeClick()"
+  (keydown.space)="onBadgeClick()">
+  
+  <!-- Badge icon -->
+  <div class="badge-icon-wrapper">
+    <div class="badge-glow"></div>
+    <div class="badge-icon">
+      <i [class]="achievement.iconClass"></i>
+    </div>
+    @if (!achievement.isUnlocked) {
+      <div class="lock-overlay">
+        <i class="fas fa-lock"></i>
+      </div>
+    }
+    @if (achievement.progress !== undefined && achievement.progress < 100 && !achievement.isUnlocked) {
+      <svg class="progress-ring" viewBox="0 0 100 100">
+        <circle
+          class="progress-ring-bg"
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke-width="6">
+        </circle>
+        <circle
+          class="progress-ring-fill"
+          cx="50"
+          cy="50"
+          r="45"
+          fill="none"
+          stroke-width="6"
+          [style.stroke-dasharray]="283"
+          [style.stroke-dashoffset]="283 - (283 * achievement.progress / 100)">
+        </circle>
+      </svg>
+    }
+  </div>
+
+  <!-- Badge details -->
+  @if (showDetails) {
+    <div class="badge-details">
+      <span class="badge-name">{{ achievement.name }}</span>
+      
+      @if (size !== 'small') {
+        <span class="badge-description">{{ achievement.description }}</span>
+      }
+
+      @if (achievement.isUnlocked && achievement.unlockedAt) {
+        <span class="unlock-date">
+          <i class="fas fa-calendar-check"></i>
+          {{ formatDate(achievement.unlockedAt) }}
+        </span>
+      } @else if (achievement.progress !== undefined) {
+        <span class="progress-text">{{ achievement.progress }}% hoàn thành</span>
+      } @else if (achievement.requirement) {
+        <span class="requirement-text">{{ achievement.requirement }}</span>
+      }
+
+      @if (achievement.reward && size === 'large') {
+        <div class="badge-reward">
+          @if (achievement.reward.type === 'premium_days') {
+            <span class="reward-tag">
+              <i class="fas fa-crown"></i>
+              +{{ achievement.reward.value }} ngày Premium
+            </span>
+          } @else if (achievement.reward.type === 'badge') {
+            <span class="reward-tag">
+              <i class="fas fa-medal"></i>
+              Huy hiệu
+            </span>
+          } @else if (achievement.reward.type === 'title') {
+            <span class="reward-tag">
+              <i class="fas fa-tag"></i>
+              Danh hiệu: {{ achievement.reward.value }}
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Rarity indicator -->
+    <div class="rarity-indicator" [attr.data-rarity]="achievement.rarity">
+      {{ rarityLabel }}
+    </div>
+  }
+</div>

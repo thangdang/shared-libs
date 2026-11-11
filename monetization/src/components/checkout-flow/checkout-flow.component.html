@@ -1,0 +1,209 @@
+<div class="checkout-container">
+  <!-- Progress Steps -->
+  <div class="checkout-progress">
+    <div 
+      *ngFor="let s of steps; let i = index"
+      class="progress-step"
+      [class.active]="getStepIndex(state.step) === i"
+      [class.completed]="getStepIndex(state.step) > i"
+    >
+      <div class="step-number">{{ i + 1 }}</div>
+      <div class="step-label">{{ s.label }}</div>
+    </div>
+  </div>
+
+  <!-- Step Content -->
+  <div class="checkout-content">
+    
+    <!-- Step 1:  Select Plan -->
+    <div *ngIf="state.step === 'select-plan'" class="step-panel">
+      <h2>Chọn gói đăng ký</h2>
+      
+      <div class="tier-grid">
+        <div 
+          *ngFor="let tier of tiers"
+          class="tier-card"
+          [class.selected]="state.selectedTier?.id === tier.id"
+          [class.recommended]="tier.recommended"
+          (click)="selectTier(tier)"
+        >
+          <div *ngIf="tier.recommended" class="recommended-badge">Phổ biến</div>
+          <h3>{{ tier.name }}</h3>
+          <div class="tier-price">
+            <span class="price">{{ tier.priceDisplay }}</span>
+            <span class="cycle">/{{ tier.billingCycle === 'monthly' ? 'tháng' : 'năm' }}</span>
+          </div>
+          <ul class="tier-features">
+            <li *ngFor="let feature of tier.features">
+              <span class="check-icon">✓</span>
+              {{ feature }}
+            </li>
+          </ul>
+          <button 
+            class="select-btn"
+            [class.selected]="state.selectedTier?.id === tier.id"
+          >
+            {{ state.selectedTier?.id === tier.id ? 'Đã chọn' : 'Chọn gói này' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button 
+          class="btn btn-primary"
+          [disabled]="!state.selectedTier"
+          (click)="goToStep('customer-info')"
+        >
+          Tiếp tục
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2:  Customer Info -->
+    <div *ngIf="state.step === 'customer-info'" class="step-panel">
+      <h2>Thông tin khách hàng</h2>
+      
+      <form [formGroup]="customerForm" class="customer-form">
+        <div class="form-group">
+          <label for="fullName">Họ và tên *</label>
+          <input 
+            id="fullName"
+            type="text"
+            formControlName="fullName"
+            placeholder="Nguyễn Văn A"
+          />
+          <span *ngIf="customerForm.get('fullName')?.touched && customerForm.get('fullName')?.errors?.['required']" class="error">
+            Vui lòng nhập họ tên
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="example&#64;email.com"
+          />
+          <span *ngIf="customerForm.get('email')?.touched && customerForm.get('email')?.errors?.['required']" class="error">
+            Vui lòng nhập email
+          </span>
+          <span *ngIf="customerForm.get('email')?.touched && customerForm.get('email')?.errors?.['email']" class="error">
+            Email không hợp lệ
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Số điện thoại *</label>
+          <input 
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="0912345678"
+          />
+          <span *ngIf="customerForm.get('phone')?.touched && customerForm.get('phone')?.errors?.['required']" class="error">
+            Vui lòng nhập số điện thoại
+          </span>
+          <span *ngIf="customerForm.get('phone')?.touched && customerForm.get('phone')?.errors?.['pattern']" class="error">
+            Số điện thoại không hợp lệ
+          </span>
+        </div>
+      </form>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" (click)="goToStep('select-plan')">
+          Quay lại
+        </button>
+        <button 
+          class="btn btn-primary"
+          [disabled]="customerForm.invalid"
+          (click)="saveCustomerInfo()"
+        >
+          Tiếp tục
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3:  Payment -->
+    <div *ngIf="state.step === 'payment'" class="step-panel">
+      <h2>Phương thức thanh toán</h2>
+      
+      <div class="order-summary">
+        <h3>Đơn hàng của bạn</h3>
+        <div class="summary-row">
+          <span>{{ state.selectedTier?.name }}</span>
+          <span>{{ state.selectedTier?.priceDisplay }}</span>
+        </div>
+        <div class="summary-total">
+          <span>Tổng cộng</span>
+          <span>{{ state.selectedTier?.priceDisplay }}</span>
+        </div>
+      </div>
+
+      <div class="payment-methods">
+        <div 
+          class="payment-method"
+          [class.selected]="state.paymentMethod === 'vnpay'"
+          (click)="selectPaymentMethod('vnpay')"
+        >
+          <img src="/assets/icons/vnpay.png" alt="VNPay" />
+          <div class="method-info">
+            <strong>VNPay</strong>
+            <span>Thẻ ATM, Visa, MasterCard, JCB</span>
+          </div>
+        </div>
+
+        <div 
+          class="payment-method"
+          [class.selected]="state.paymentMethod === 'momo'"
+          (click)="selectPaymentMethod('momo')"
+        >
+          <img src="/assets/icons/momo.png" alt="MoMo" />
+          <div class="method-info">
+            <strong>MoMo</strong>
+            <span>Ví điện tử MoMo</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-actions">
+        <button class="btn btn-secondary" (click)="goToStep('customer-info')">
+          Quay lại
+        </button>
+        <button 
+          class="btn btn-primary"
+          [disabled]="!state.paymentMethod || processing"
+          (click)="processPayment()"
+        >
+          {{ processing ? 'Đang xử lý...' : 'Thanh toán' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4:  Success -->
+    <div *ngIf="state.step === 'success'" class="step-panel success-panel">
+      <div class="success-icon">✓</div>
+      <h2>Thanh toán thành công!</h2>
+      <p>Cảm ơn bạn đã đăng ký.  Gói {{ state.selectedTier?.name }} đã được kích hoạt.</p>
+      <p class="order-id">Mã đơn hàng:  {{ state.orderId }}</p>
+      <button class="btn btn-primary" (click)="complete.emit({ success: true, orderId: state.orderId || undefined })">
+        Bắt đầu sử dụng
+      </button>
+    </div>
+
+    <!-- Step 5:  Error -->
+    <div *ngIf="state.step === 'error'" class="step-panel error-panel">
+      <div class="error-icon">✗</div>
+      <h2>Thanh toán thất bại</h2>
+      <p>{{ state.error || 'Đã xảy ra lỗi trong quá trình thanh toán.' }}</p>
+      <div class="step-actions">
+        <button class="btn btn-secondary" (click)="goToStep('payment')">
+          Thử lại
+        </button>
+        <button class="btn btn-text" (click)="cancel.emit()">
+          Hủy bỏ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

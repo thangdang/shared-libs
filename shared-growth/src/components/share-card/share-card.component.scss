@@ -1,0 +1,534 @@
+/**
+ * Share Card Styles
+ * Tasks: GRW-017, GRW-018
+ * Optimized for social sharing (OG image dimensions)
+ */
+
+// Card Base - Standard OG image ratio (1.91:1 or 1200x630)
+.share-card {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  &--compact {
+    max-width: 320px;
+  }
+}
+
+// Card Badge (top corner)
+.card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    font-size: 10px;
+  }
+}
+
+.price-badge {
+  background: linear-gradient(135deg, #ff4757, #ff6b81);
+  color: white;
+}
+
+.news-badge {
+  background: linear-gradient(135deg, #ff9500, #ffb347);
+  color: white;
+}
+
+// Card Image
+.card-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #f5f5f5;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+}
+
+// Card Header (for result-type cards)
+.card-header {
+  padding: 24px;
+  color: white;
+  text-align: center;
+
+  h3 {
+    margin: 8px 0 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .result-icon {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+
+  &.tax-header {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+  }
+
+  &.dtc-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    
+    .dtc-code {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: 'Roboto Mono', monospace;
+      letter-spacing: 2px;
+    }
+  }
+
+  &.health-header {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+  }
+}
+
+// Card Content
+.card-content {
+  padding: 20px;
+}
+
+.card-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-summary {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.category-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  margin-bottom: 8px;
+  background: #e8f4fd;
+  color: #2980b9;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 4px;
+}
+
+// Price Section (SmartBuy)
+.price-section {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.price-old {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.price-new {
+  font-size: 24px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.savings {
+  font-size: 14px;
+  color: #27ae60;
+  margin-bottom: 12px;
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+// Result Section
+.result-value {
+  text-align: center;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+
+  .value-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .value-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2ecc71;
+  }
+}
+
+.result-details {
+  margin-bottom: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    color: #666;
+  }
+
+  .detail-value {
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.result-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+// Tax Breakdown
+.tax-result-main {
+  text-align: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  margin-bottom: 16px;
+
+  .tax-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+
+  .tax-amount {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #e74c3c;
+  }
+}
+
+.tax-breakdown {
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13px;
+    color: #666;
+    border-bottom: 1px dashed #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.highlight {
+      font-weight: 600;
+      color: #2ecc71;
+      padding-top: 12px;
+      margin-top: 4px;
+      border-top: 2px solid #2ecc71;
+    }
+  }
+}
+
+// DTC Specific
+.dtc-title {
+  font-size: 16px;
+  margin: 0 0 8px;
+  color: #333;
+}
+
+.dtc-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.severity-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+
+  &.severity-low {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  &.severity-medium {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  &.severity-high {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  &.severity-critical {
+    background: #721c24;
+    color: white;
+  }
+}
+
+.dtc-meta {
+  font-size: 12px;
+  color: #888;
+
+  .meta-label {
+    margin-right: 4px;
+  }
+
+  .models {
+    font-weight: 500;
+    color: #555;
+  }
+}
+
+// Health Specific
+.drug-info {
+  margin-bottom: 12px;
+
+  .drug-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .drug-generic {
+    font-size: 14px;
+    color: #888;
+    margin-left: 4px;
+  }
+}
+
+.health-description {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.price-comparison {
+  margin-bottom: 12px;
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .pharmacy {
+      color: #666;
+    }
+
+    .price {
+      font-weight: 600;
+      color: #e74c3c;
+    }
+  }
+}
+
+.health-disclaimer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff3cd;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #856404;
+  margin-top: 8px;
+
+  i {
+    color: #ffc107;
+  }
+}
+
+// Card Meta
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #888;
+  margin-top: 12px;
+}
+
+.platform {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .platform-logo {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+}
+
+// Card Footer (Branding)
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+
+  .app-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  .app-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .tagline {
+    font-size: 11px;
+    color: #888;
+    margin-left: auto;
+  }
+}
+
+// Watermark
+.watermark {
+  position: absolute;
+  bottom: 48px;
+  right: 12px;
+  font-size: 10px;
+  color: rgba(0, 0, 0, 0.3);
+  font-style: italic;
+}
+
+// Share Actions
+.share-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #ddd;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #27ae60;
+    transform: translateY(-1px);
+  }
+
+  i {
+    font-size: 12px;
+  }
+}
+
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  .share-card {
+    background: #1a1a2e;
+    
+    .card-title {
+      color: #fff;
+    }
+
+    .card-summary,
+    .result-description,
+    .dtc-description,
+    .health-description {
+      color: #aaa;
+    }
+
+    .card-footer {
+      background: #16213e;
+      border-color: #2a2a4a;
+
+      .app-name {
+        color: #fff;
+      }
+    }
+  }
+}
+
+// Print/Screenshot optimization
+@media print {
+  .share-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .share-actions {
+    display: none;
+  }
+}

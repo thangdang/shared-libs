@@ -1,0 +1,233 @@
+<!-- Share Card Component -->
+<!-- Tasks: GRW-017 (Price Drop), GRW-018 (Result), GRW-019 (OG Meta) -->
+
+<div class="share-card" 
+     [class]="'share-card--' + variant"
+     [class.share-card--compact]="compact"
+     #cardElement>
+  
+  <!-- Price Drop Card -->
+  <ng-container *ngIf="variant === 'price-drop'">
+    <div class="card-badge price-badge">
+      <i class="fas fa-arrow-down"></i>
+      GIẢM {{ data.discountPercent }}%
+    </div>
+    
+    <div class="card-image" *ngIf="data.imageUrl">
+      <img [src]="data.imageUrl" [alt]="data.title" loading="lazy">
+    </div>
+    
+    <div class="card-content">
+      <h3 class="card-title">{{ data.title }}</h3>
+      
+      <div class="price-section">
+        <span class="price-old">{{ formatPrice(data.originalPrice) }}</span>
+        <span class="price-new">{{ formatPrice(data.currentPrice) }}</span>
+      </div>
+      
+      <div class="savings">
+        Tiết kiệm: <strong>{{ formatPrice(data.savings) }}</strong>
+      </div>
+      
+      <div class="card-meta">
+        <span class="platform">
+          <img [src]="getPlatformLogo(data.platform)" [alt]="data.platform" class="platform-logo">
+          {{ data.platform }}
+        </span>
+        <span class="timestamp">{{ formatTime(data.timestamp) }}</span>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <img src="assets/logo-small.png" alt="SmartBuy" class="app-logo">
+      <span class="app-name">SmartBuy</span>
+      <span class="tagline">So sánh giá thông minh</span>
+    </div>
+  </ng-container>
+
+  <!-- Result Card (Generic) -->
+  <ng-container *ngIf="variant === 'result'">
+    <div class="card-header" [style.background]="data.headerColor || '#4CAF50'">
+      <div class="result-icon">
+        <i [class]="data.icon || 'fas fa-check-circle'"></i>
+      </div>
+      <h3 class="result-title">{{ data.title }}</h3>
+    </div>
+    
+    <div class="card-content">
+      <div class="result-value" *ngIf="data.mainValue">
+        <span class="value-label">{{ data.mainLabel }}</span>
+        <span class="value-number">{{ data.mainValue }}</span>
+      </div>
+      
+      <div class="result-details" *ngIf="data.details?.length">
+        <div class="detail-row" *ngFor="let detail of data.details">
+          <span class="detail-label">{{ detail.label }}</span>
+          <span class="detail-value">{{ detail.value }}</span>
+        </div>
+      </div>
+      
+      <p class="result-description" *ngIf="data.description">
+        {{ data.description }}
+      </p>
+    </div>
+    
+    <div class="card-footer">
+      <img [src]="data.appLogo || 'assets/logo-small.png'" [alt]="data.appName" class="app-logo">
+      <span class="app-name">{{ data.appName }}</span>
+      <span class="tagline">{{ data.tagline }}</span>
+    </div>
+  </ng-container>
+
+  <!-- News/Article Card -->
+  <ng-container *ngIf="variant === 'news'">
+    <div class="card-badge news-badge" *ngIf="data.isBreaking">
+      <i class="fas fa-bolt"></i> TIN NÓNG
+    </div>
+    
+    <div class="card-image" *ngIf="data.imageUrl">
+      <img [src]="data.imageUrl" [alt]="data.title" loading="lazy">
+    </div>
+    
+    <div class="card-content">
+      <span class="category-tag" *ngIf="data.category">{{ data.category }}</span>
+      <h3 class="card-title">{{ data.title }}</h3>
+      <p class="card-summary" *ngIf="data.summary">{{ data.summary }}</p>
+      
+      <div class="card-meta">
+        <span class="source" *ngIf="data.source">{{ data.source }}</span>
+        <span class="timestamp">{{ formatTime(data.timestamp) }}</span>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <img src="assets/trendbrief-logo.png" alt="TrendBrief" class="app-logo">
+      <span class="app-name">TrendBrief</span>
+      <span class="tagline">Tin tức thông minh</span>
+    </div>
+  </ng-container>
+
+  <!-- Tax Calculation Card -->
+  <ng-container *ngIf="variant === 'tax'">
+    <div class="card-header tax-header">
+      <i class="fas fa-calculator"></i>
+      <h3>Kết quả tính thuế TNCN</h3>
+    </div>
+    
+    <div class="card-content">
+      <div class="tax-result-main">
+        <span class="tax-label">Thuế TNCN phải nộp:</span>
+        <span class="tax-amount">{{ formatPrice(data.taxAmount) }}/tháng</span>
+      </div>
+      
+      <div class="tax-breakdown">
+        <div class="breakdown-row">
+          <span>Thu nhập gross:</span>
+          <span>{{ formatPrice(data.grossIncome) }}</span>
+        </div>
+        <div class="breakdown-row">
+          <span>Giảm trừ bản thân:</span>
+          <span>{{ formatPrice(data.personalDeduction) }}</span>
+        </div>
+        <div class="breakdown-row" *ngIf="data.dependentDeduction">
+          <span>Giảm trừ người phụ thuộc:</span>
+          <span>{{ formatPrice(data.dependentDeduction) }}</span>
+        </div>
+        <div class="breakdown-row highlight">
+          <span>Thu nhập thực nhận:</span>
+          <span>{{ formatPrice(data.netIncome) }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <img src="assets/fintax-logo.png" alt="FinTax" class="app-logo">
+      <span class="app-name">FinTax</span>
+      <span class="tagline">Quản lý tài chính cá nhân</span>
+    </div>
+  </ng-container>
+
+  <!-- DTC Code Card -->
+  <ng-container *ngIf="variant === 'dtc'">
+    <div class="card-header dtc-header">
+      <div class="dtc-code">{{ data.dtcCode }}</div>
+    </div>
+    
+    <div class="card-content">
+      <h3 class="dtc-title">{{ data.title }}</h3>
+      <p class="dtc-description">{{ data.description }}</p>
+      
+      <div class="severity-indicator" [class]="'severity-' + data.severity">
+        <i [class]="getSeverityIcon(data.severity)"></i>
+        {{ getSeverityLabel(data.severity) }}
+      </div>
+      
+      <div class="dtc-meta" *ngIf="data.affectedModels?.length">
+        <span class="meta-label">Xe thường gặp:</span>
+        <span class="models">{{ data.affectedModels.slice(0, 3).join(', ') }}</span>
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <img src="assets/doctorcar-logo.png" alt="DoctorCar" class="app-logo">
+      <span class="app-name">DoctorCar</span>
+      <span class="tagline">Bác sĩ xe hơi</span>
+    </div>
+  </ng-container>
+
+  <!-- Health/Drug Card -->
+  <ng-container *ngIf="variant === 'health'">
+    <div class="card-header health-header">
+      <i class="fas fa-pills"></i>
+      <h3>{{ data.title }}</h3>
+    </div>
+    
+    <div class="card-content">
+      <div class="drug-info" *ngIf="data.drugName">
+        <span class="drug-name">{{ data.drugName }}</span>
+        <span class="drug-generic" *ngIf="data.genericName">({{ data.genericName }})</span>
+      </div>
+      
+      <p class="health-description">{{ data.description }}</p>
+      
+      <div class="price-comparison" *ngIf="data.prices?.length">
+        <div class="price-row" *ngFor="let price of data.prices.slice(0, 3)">
+          <span class="pharmacy">{{ price.pharmacy }}</span>
+          <span class="price">{{ formatPrice(price.price) }}</span>
+        </div>
+      </div>
+      
+      <!-- CRITICAL: Health disclaimer -->
+      <div class="health-disclaimer">
+        <i class="fas fa-exclamation-triangle"></i>
+        Tham khảo ý kiến bác sĩ trước khi sử dụng
+      </div>
+    </div>
+    
+    <div class="card-footer">
+      <img src="assets/caremate-logo.png" alt="CareMate" class="app-logo">
+      <span class="app-name">CareMate</span>
+      <span class="tagline">Chăm sóc sức khỏe</span>
+    </div>
+  </ng-container>
+
+  <!-- Watermark -->
+  <div class="watermark" *ngIf="showWatermark">
+    <span>Tạo bởi {{ data.appName || 'AI Apps VN' }}</span>
+  </div>
+</div>
+
+<!-- Share Actions (outside card for cleaner screenshot) -->
+<div class="share-actions" *ngIf="showActions">
+  <button class="btn-download" (click)="downloadAsImage()">
+    <i class="fas fa-download"></i> Tải ảnh
+  </button>
+  
+  <app-social-share-buttons
+    [content]="shareContent"
+    [platforms]="sharePlatforms"
+    layout="compact"
+    size="small"
+    [trackingSource]="variant">
+  </app-social-share-buttons>
+</div>

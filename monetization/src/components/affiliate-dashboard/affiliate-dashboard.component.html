@@ -1,0 +1,237 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1 class="dashboard-title">
+      <span class="icon">💰</span>
+      Affiliate Dashboard
+    </h1>
+    <div class="header-actions">
+      <select [(ngModel)]="selectedRange" (change)="onRangeChange()" class="range-select">
+        @for (range of dateRanges; track range.id) {
+          <option [value]="range.id">{{ range.label }}</option>
+        }
+      </select>
+      <button class="refresh-btn" (click)="refresh()" [disabled]="loading()">
+        <span class="icon">🔄</span>
+        Refresh
+      </button>
+      <button class="export-btn" (click)="exportReport()">
+        <span class="icon">📥</span>
+        Export
+      </button>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Loading data...</p>
+    </div>
+  }
+
+  <!-- Summary Cards -->
+  <section class="summary-section">
+    <div class="summary-card">
+      <div class="card-icon clicks">👆</div>
+      <div class="card-content">
+        <span class="card-value">{{ stats().totalClicks | number }}</span>
+        <span class="card-label">Total Clicks</span>
+        <span class="card-change" [class.positive]="clicksChange() > 0" [class.negative]="clicksChange() < 0">
+          {{ clicksChange() > 0 ? '+' : '' }}{{ clicksChange() | number:'1.1-1' }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon conversions">🛒</div>
+      <div class="card-content">
+        <span class="card-value">{{ stats().totalConversions | number }}</span>
+        <span class="card-label">Conversions</span>
+        <span class="card-change" [class.positive]="conversionsChange() > 0" [class.negative]="conversionsChange() < 0">
+          {{ conversionsChange() > 0 ? '+' : '' }}{{ conversionsChange() | number:'1.1-1' }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon revenue">💵</div>
+      <div class="card-content">
+        <span class="card-value">{{ stats().totalRevenue | number }}đ</span>
+        <span class="card-label">Total Revenue</span>
+        <span class="card-change" [class.positive]="revenueChange() > 0" [class.negative]="revenueChange() < 0">
+          {{ revenueChange() > 0 ? '+' : '' }}{{ revenueChange() | number:'1.1-1' }}%
+        </span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon rate">📊</div>
+      <div class="card-content">
+        <span class="card-value">{{ stats().conversionRate | number:'1.2-2' }}%</span>
+        <span class="card-label">Conversion Rate</span>
+      </div>
+    </div>
+
+    <div class="summary-card highlight">
+      <div class="card-icon commission">🏦</div>
+      <div class="card-content">
+        <span class="card-value">{{ stats().pendingCommission | number }}đ</span>
+        <span class="card-label">Pending Commission</span>
+        <span class="card-paid">
+          Paid: {{ stats().paidCommission | number }}đ
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="dashboard-grid">
+    <!-- Platform Breakdown -->
+    <section class="panel platform-panel">
+      <h2 class="panel-title">
+        <span class="icon">🏪</span>
+        Platform Performance
+      </h2>
+      <div class="platform-list">
+        @for (platform of platformStats(); track platform.platform) {
+          <div class="platform-item" [class]="platform.platform">
+            <div class="platform-logo">
+              <img [src]="'assets/icons/' + platform.platform + '.svg'" [alt]="platform.platform">
+            </div>
+            <div class="platform-info">
+              <span class="platform-name">{{ getPlatformName(platform.platform) }}</span>
+              <div class="platform-stats">
+                <span class="stat">
+                  <span class="label">Clicks:</span>
+                  <span class="value">{{ platform.clicks | number }}</span>
+                </span>
+                <span class="stat">
+                  <span class="label">Conv:</span>
+                  <span class="value">{{ platform.conversions | number }}</span>
+                </span>
+                <span class="stat">
+                  <span class="label">Rate:</span>
+                  <span class="value">{{ platform.conversionRate | number:'1.2-2' }}%</span>
+                </span>
+              </div>
+            </div>
+            <div class="platform-revenue">
+              <span class="revenue-value">{{ platform.revenue | number }}đ</span>
+              <span class="commission-value">HH: {{ platform.commission | number }}đ</span>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Daily Chart -->
+    <section class="panel chart-panel">
+      <h2 class="panel-title">
+        <span class="icon">📈</span>
+        Daily Performance
+      </h2>
+      <div class="chart-container">
+        <div class="chart-bars">
+          @for (day of dailyStats(); track day.date) {
+            <div class="chart-bar-group">
+              <div class="bar clicks" [style.height.%]="getBarHeight(day.clicks, 'clicks')">
+                <span class="bar-tooltip">{{ day.clicks }} clicks</span>
+              </div>
+              <div class="bar revenue" [style.height.%]="getBarHeight(day.revenue, 'revenue')">
+                <span class="bar-tooltip">{{ day.revenue | number }}đ</span>
+              </div>
+              <span class="bar-label">{{ formatDate(day.date) }}</span>
+            </div>
+          }
+        </div>
+        <div class="chart-legend">
+          <span class="legend-item">
+            <span class="legend-color clicks"></span>
+            Clicks
+          </span>
+          <span class="legend-item">
+            <span class="legend-color revenue"></span>
+            Revenue
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Products -->
+    <section class="panel products-panel">
+      <h2 class="panel-title">
+        <span class="icon">⭐</span>
+        Top Performing Products
+      </h2>
+      <div class="products-table">
+        <div class="table-header">
+          <span class="col-product">Product</span>
+          <span class="col-platform">Platform</span>
+          <span class="col-clicks">Clicks</span>
+          <span class="col-conv">Conv</span>
+          <span class="col-revenue">Revenue</span>
+          <span class="col-commission">Commission</span>
+        </div>
+        <div class="table-body">
+          @for (product of topProducts(); track product.productId) {
+            <div class="table-row">
+              <div class="col-product">
+                @if (product.imageUrl) {
+                  <img [src]="product.imageUrl" [alt]="product.name" class="product-image">
+                } @else {
+                  <div class="product-placeholder">📦</div>
+                }
+                <span class="product-name">{{ product.name }}</span>
+              </div>
+              <span class="col-platform">
+                <span class="platform-badge" [class]="product.platform">
+                  {{ product.platform }}
+                </span>
+              </span>
+              <span class="col-clicks">{{ product.clicks | number }}</span>
+              <span class="col-conv">{{ product.conversions | number }}</span>
+              <span class="col-revenue">{{ product.revenue | number }}đ</span>
+              <span class="col-commission">{{ product.commission | number }}đ</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="panel actions-panel">
+      <h2 class="panel-title">
+        <span class="icon">⚡</span>
+        Quick Actions
+      </h2>
+      <div class="actions-list">
+        <a href="/admin/affiliate/links" class="action-card">
+          <span class="action-icon">🔗</span>
+          <div class="action-content">
+            <span class="action-name">Manage Links</span>
+            <span class="action-desc">Create and edit affiliate links</span>
+          </div>
+        </a>
+        <a href="/admin/affiliate/payouts" class="action-card">
+          <span class="action-icon">💳</span>
+          <div class="action-content">
+            <span class="action-name">Payouts</span>
+            <span class="action-desc">View commission payments</span>
+          </div>
+        </a>
+        <a href="/admin/affiliate/reports" class="action-card">
+          <span class="action-icon">📊</span>
+          <div class="action-content">
+            <span class="action-name">Detailed Reports</span>
+            <span class="action-desc">In-depth analytics</span>
+          </div>
+        </a>
+        <a href="/admin/affiliate/settings" class="action-card">
+          <span class="action-icon">⚙️</span>
+          <div class="action-content">
+            <span class="action-name">Settings</span>
+            <span class="action-desc">Configure affiliate accounts</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>

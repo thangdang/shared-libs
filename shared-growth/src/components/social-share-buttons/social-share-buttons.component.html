@@ -1,0 +1,55 @@
+<!-- Social Share Buttons Component -->
+<!-- Task: GRW-016 - Vietnamese market focused sharing -->
+
+<div class="social-share" 
+     [class.horizontal]="layout === 'horizontal'"
+     [class.vertical]="layout === 'vertical'"
+     [class.compact]="layout === 'compact'"
+     [class.size-small]="size === 'small'"
+     [class.size-medium]="size === 'medium'"
+     [class.size-large]="size === 'large'">
+  
+  <!-- Share Label -->
+  <span class="share-label" *ngIf="showLabels && layout !== 'compact'">
+    Chia sẻ:
+  </span>
+
+  <!-- Share Buttons -->
+  <div class="share-buttons">
+    <button 
+      *ngFor="let button of buttons"
+      class="share-btn"
+      [class.copied]="button.platform === 'copy' && copied"
+      [style]="getButtonStyle(button)"
+      [attr.aria-label]="'Chia sẻ qua ' + button.label"
+      [title]="button.label"
+      (click)="share(button.platform)">
+      
+      <!-- Icon -->
+      <span class="btn-icon">
+        <!-- Zalo Custom SVG (no FontAwesome icon) -->
+        <ng-container *ngIf="button.platform === 'zalo'">
+          <svg class="zalo-svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 14.842c-.327.652-.947 1.24-1.702 1.593-.48.225-.98.34-1.49.34-.374 0-.756-.063-1.138-.187-.59-.193-1.188-.514-1.782-.96-.68-.51-1.349-1.165-2.005-1.957l-.01-.012c-.654-.794-1.187-1.566-1.596-2.319-.348-.637-.614-1.27-.8-1.893-.15-.502-.226-.995-.226-1.47 0-.545.105-1.068.312-1.557.265-.625.68-1.16 1.23-1.59.445-.347.916-.573 1.402-.678.138-.03.275-.045.41-.045.32 0 .62.074.895.22.35.186.655.5.886.91l1.37 2.432c.147.261.22.55.22.866 0 .383-.114.75-.328 1.06-.162.235-.373.44-.628.608l-.265.175c-.07.046-.14.098-.207.155.244.418.574.88.996 1.392.48.58.919 1.02 1.32 1.325.06-.05.126-.096.198-.137l.31-.176c.33-.188.704-.283 1.113-.283.295 0 .572.05.827.15.31.122.588.322.808.58l1.588 1.856c.29.34.442.758.442 1.21 0 .435-.14.845-.405 1.186z"/>
+          </svg>
+        </ng-container>
+        
+        <!-- FontAwesome Icons -->
+        <ng-container *ngIf="button.platform !== 'zalo'">
+          <i [class]="getIconClass(button)"></i>
+        </ng-container>
+        
+        <!-- Copied checkmark -->
+        <i *ngIf="button.platform === 'copy' && copied" class="fas fa-check copied-icon"></i>
+      </span>
+
+      <!-- Label -->
+      <span class="btn-label" *ngIf="showLabels && layout !== 'compact'">
+        {{ button.platform === 'copy' && copied ? 'Đã sao chép!' : button.label }}
+      </span>
+    </button>
+  </div>
+
+  <!-- Share Count (optional) -->
+  <ng-content select="[shareCount]"></ng-content>
+</div>

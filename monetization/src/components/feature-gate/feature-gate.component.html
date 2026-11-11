@@ -1,0 +1,31 @@
+<!-- Hide mode:  Don't render at all -->
+<ng-container *ngIf="mode !== 'hide' || hasAccess">
+  <div class="feature-gate" [class.locked]="!hasAccess" [class.mode-blur]="!hasAccess && mode === 'blur'">
+    
+    <!-- Content -->
+    <div class="gate-content" [class.blurred]="!hasAccess && mode === 'blur'" [class.disabled]="!hasAccess && mode === 'disabled'">
+      <ng-content></ng-content>
+    </div>
+
+    <!-- Lock Overlay -->
+    <div *ngIf="!hasAccess && (mode === 'blur' || mode === 'lock')" class="gate-overlay">
+      <div class="lock-content">
+        <div class="lock-icon">{{ mode === 'blur' ? '🔒' : '⭐' }}</div>
+        <h3 class="lock-title">{{ title || getDefaultTitle() }}</h3>
+        <p class="lock-description">{{ description || getDefaultDescription() }}</p>
+        <button class="upgrade-btn" (click)="upgradeClick.emit()">
+          {{ upgradeText || 'Nâng cấp ngay' }}
+        </button>
+        <button *ngIf="showDismiss" class="dismiss-btn" (click)="dismiss()">
+          Để sau
+        </button>
+      </div>
+    </div>
+
+    <!-- Disabled mode:  Show tooltip on hover -->
+    <div *ngIf="!hasAccess && mode === 'disabled'" class="disabled-tooltip">
+      <span class="tooltip-icon">🔒</span>
+      {{ tooltipText || 'Tính năng này cần gói ' + requiredTier }}
+    </div>
+  </div>
+</ng-container>

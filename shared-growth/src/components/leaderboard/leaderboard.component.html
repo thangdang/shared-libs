@@ -1,0 +1,181 @@
+@if (leaderboardData(); as data) {
+  <div class="leaderboard">
+    <!-- Header -->
+    <div class="leaderboard-header">
+      <h2 class="leaderboard-title">
+        <i class="fas fa-trophy"></i>
+        Bảng xếp hạng
+      </h2>
+
+      @if (enablePeriodSwitch) {
+        <div class="period-tabs">
+          @for (period of periods; track period.value) {
+            <button
+              type="button"
+              class="period-tab"
+              [class.active]="data.period === period.value"
+              (click)="onPeriodChange(period.value)">
+              {{ period.label }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Category tabs -->
+    <div class="category-tabs">
+      @for (category of categories; track category.value) {
+        <button
+          type="button"
+          class="category-tab"
+          [class.active]="data.category === category.value"
+          (click)="onCategoryChange(category.value)">
+          <i [class]="category.icon"></i>
+          {{ category.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Top 3 podium -->
+    @if (topThree().length >= 3) {
+      <div class="podium">
+        <!-- Second place -->
+        <div class="podium-item second" (click)="onUserClick(topThree()[1].userId)">
+          <div class="podium-avatar">
+            @if (topThree()[1].avatarUrl) {
+              <img [src]="topThree()[1].avatarUrl" [alt]="topThree()[1].displayName">
+            } @else {
+              <span class="avatar-initial">{{ getInitial(topThree()[1].displayName) }}</span>
+            }
+            <span class="rank-badge">🥈</span>
+          </div>
+          <span class="podium-name">{{ topThree()[1].displayName }}</span>
+          <span class="podium-score">{{ formatScore(topThree()[1].score) }}</span>
+        </div>
+
+        <!-- First place -->
+        <div class="podium-item first" (click)="onUserClick(topThree()[0].userId)">
+          <div class="crown">👑</div>
+          <div class="podium-avatar">
+            @if (topThree()[0].avatarUrl) {
+              <img [src]="topThree()[0].avatarUrl" [alt]="topThree()[0].displayName">
+            } @else {
+              <span class="avatar-initial">{{ getInitial(topThree()[0].displayName) }}</span>
+            }
+            <span class="rank-badge">🥇</span>
+          </div>
+          <span class="podium-name">{{ topThree()[0].displayName }}</span>
+          <span class="podium-score">{{ formatScore(topThree()[0].score) }}</span>
+        </div>
+
+        <!-- Third place -->
+        <div class="podium-item third" (click)="onUserClick(topThree()[2].userId)">
+          <div class="podium-avatar">
+            @if (topThree()[2].avatarUrl) {
+              <img [src]="topThree()[2].avatarUrl" [alt]="topThree()[2].displayName">
+            } @else {
+              <span class="avatar-initial">{{ getInitial(topThree()[2].displayName) }}</span>
+            }
+            <span class="rank-badge">🥉</span>
+          </div>
+          <span class="podium-name">{{ topThree()[2].displayName }}</span>
+          <span class="podium-score">{{ formatScore(topThree()[2].score) }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Rest of leaderboard -->
+    @if (restEntries().length > 0) {
+      <div class="entries-list">
+        @for (entry of restEntries(); track entry.userId) {
+          <div 
+            class="entry-item"
+            [class.current-user]="entry.isCurrentUser"
+            (click)="onUserClick(entry.userId)">
+            <span class="entry-rank">{{ entry.rank }}</span>
+            
+            <div class="entry-avatar">
+              @if (entry.avatarUrl) {
+                <img [src]="entry.avatarUrl" [alt]="entry.displayName">
+              } @else {
+                <span class="avatar-initial">{{ getInitial(entry.displayName) }}</span>
+              }
+            </div>
+
+            <div class="entry-info">
+              <span class="entry-name">
+                {{ entry.displayName }}
+                @if (entry.badge) {
+                  <span class="user-badge">{{ entry.badge }}</span>
+                }
+              </span>
+              @if (getRankChange(entry).direction !== 'same') {
+                <span class="rank-change" [class]="getRankChange(entry).direction">
+                  @if (getRankChange(entry).direction === 'up') {
+                    <i class="fas fa-arrow-up"></i>
+                  } @else {
+                    <i class="fas fa-arrow-down"></i>
+                  }
+                  {{ getRankChange(entry).value }}
+                </span>
+              }
+            </div>
+
+            <span class="entry-score">{{ formatScore(entry.score) }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Current user (if not in top) -->
+    @if (showCurrentUser && data.currentUserEntry && !displayEntries().some(e => e.isCurrentUser)) {
+      <div class="current-user-section">
+        <div class="separator">
+          <span>Bạn</span>
+        </div>
+        <div 
+          class="entry-item current-user"
+          (click)="onUserClick(data.currentUserEntry.userId)">
+          <span class="entry-rank">{{ data.currentUserEntry.rank }}</span>
+          
+          <div class="entry-avatar">
+            @if (data.currentUserEntry.avatarUrl) {
+              <img [src]="data.currentUserEntry.avatarUrl" [alt]="data.currentUserEntry.displayName">
+            } @else {
+              <span class="avatar-initial">{{ getInitial(data.currentUserEntry.displayName) }}</span>
+            }
+          </div>
+
+          <div class="entry-info">
+            <span class="entry-name">{{ data.currentUserEntry.displayName }}</span>
+          </div>
+
+          <span class="entry-score">{{ formatScore(data.currentUserEntry.score) }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Footer -->
+    <div class="leaderboard-footer">
+      <span class="participants-count">
+        <i class="fas fa-users"></i>
+        {{ data.totalParticipants }} người tham gia
+      </span>
+      <span class="last-updated">
+        Cập nhật: {{ formatDate(data.lastUpdated) }}
+      </span>
+    </div>
+
+    <!-- View all button -->
+    <button type="button" class="view-all-btn" (click)="onViewAll()">
+      Xem tất cả
+      <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+} @else {
+  <!-- Loading state -->
+  <div class="leaderboard-loading">
+    <div class="spinner"></div>
+    <span>Đang tải bảng xếp hạng...</span>
+  </div>
+}

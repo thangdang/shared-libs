@@ -1,0 +1,42 @@
+{
+  "name": "@aivn/shared-growth",
+  "version": "1.0.0",
+  "description": "Shared growth infrastructure for 5 AI apps - organic growth tools",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "test": "jest"
+  },
+  "keywords": [
+    "growth",
+    "analytics",
+    "referral",
+    "viral",
+    "gamification",
+    "seo",
+    "a/b-testing",
+    "notifications",
+    "social-sharing",
+    "email-marketing",
+    "web-push"
+  ],
+  "author": "AIVN",
+  "license": "UNLICENSED",
+  "private": true,
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0",
+    "@angular/router": ">=19.0.0",
+    "@angular/platform-browser": ">=19.0.0",
+    "@angular/forms": ">=19.0.0"
+  },
+  "optionalDependencies": {
+    "html2canvas": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "~5.6.0"
+  }
+}

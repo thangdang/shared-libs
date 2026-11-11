@@ -1,0 +1,199 @@
+<!-- How-To Guide Component -->
+<!-- Task: GRW-005 - Write "How to" guides -->
+
+<article class="how-to-guide">
+  <!-- Schema.org HowTo markup for SEO -->
+  <script *ngIf="showSchema" type="application/ld+json" [innerHTML]="schemaMarkup"></script>
+
+  <!-- Header -->
+  <header class="guide-header">
+    <div class="guide-meta">
+      <span class="category-badge" *ngIf="guide.category">
+        {{ guide.category }}
+      </span>
+      <span class="difficulty-badge" 
+            [style.background]="getDifficultyColor(guide.difficulty)">
+        {{ getDifficultyLabel(guide.difficulty) }}
+      </span>
+      <span class="time-badge" *ngIf="guide.estimatedTime">
+        <i class="fas fa-clock"></i> {{ guide.estimatedTime }}
+      </span>
+    </div>
+
+    <h1 class="guide-title">{{ guide.title }}</h1>
+    <p class="guide-description">{{ guide.description }}</p>
+
+    <!-- Author & Date -->
+    <div class="guide-info">
+      <span *ngIf="guide.author">
+        <i class="fas fa-user"></i> {{ guide.author }}
+      </span>
+      <span *ngIf="guide.lastUpdated">
+        <i class="fas fa-calendar-alt"></i> Cập nhật: {{ guide.lastUpdated }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="progress-section" *ngIf="showProgress">
+    <div class="progress-header">
+      <span class="progress-label">Tiến độ: {{ progressPercent }}%</span>
+      <div class="progress-actions">
+        <button class="action-link" (click)="markAllComplete()">
+          <i class="fas fa-check-double"></i> Hoàn thành tất cả
+        </button>
+        <button class="action-link" (click)="resetProgress()">
+          <i class="fas fa-redo"></i> Đặt lại
+        </button>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progressPercent"></div>
+    </div>
+  </div>
+
+  <!-- Prerequisites -->
+  <section class="prerequisites" *ngIf="guide.prerequisites?.length">
+    <h2><i class="fas fa-clipboard-check"></i> Yêu cầu trước khi bắt đầu</h2>
+    <ul>
+      <li *ngFor="let prereq of guide.prerequisites">{{ prereq }}</li>
+    </ul>
+  </section>
+
+  <!-- Tools Needed -->
+  <section class="tools-needed" *ngIf="guide.tools?.length">
+    <h2><i class="fas fa-tools"></i> Công cụ cần thiết</h2>
+    <div class="tools-list">
+      <span class="tool-item" *ngFor="let tool of guide.tools">
+        <ng-container *ngIf="tool.url; else toolText">
+          <a [href]="tool.url" target="_blank" rel="noopener">{{ tool.name }}</a>
+        </ng-container>
+        <ng-template #toolText>{{ tool.name }}</ng-template>
+      </span>
+    </div>
+  </section>
+
+  <!-- Table of Contents -->
+  <nav class="table-of-contents" *ngIf="showTableOfContents && guide.steps.length > 3">
+    <h2><i class="fas fa-list-ol"></i> Các bước</h2>
+    <ol>
+      <li *ngFor="let step of guide.steps; let i = index">
+        <a (click)="scrollToStep(step.id)" class="toc-link">
+          <span class="step-number">{{ i + 1 }}</span>
+          <span class="step-title">{{ step.title }}</span>
+          <i class="fas fa-check" *ngIf="isStepComplete(step.id)"></i>
+        </a>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Steps -->
+  <section class="steps-container">
+    <div 
+      *ngFor="let step of guide.steps; let i = index; trackBy: trackByStepId"
+      class="step"
+      [class.completed]="isStepComplete(step.id)"
+      [id]="'step-' + step.id">
+      
+      <!-- Step Header -->
+      <div class="step-header">
+        <button 
+          class="step-checkbox"
+          [class.checked]="isStepComplete(step.id)"
+          (click)="toggleStepComplete(step.id)"
+          [attr.aria-label]="'Đánh dấu bước ' + (i + 1) + ' hoàn thành'">
+          <span class="step-number">{{ i + 1 }}</span>
+          <i class="fas fa-check check-icon"></i>
+        </button>
+        
+        <div class="step-title-area">
+          <h3 class="step-title">{{ step.title }}</h3>
+          <span class="step-duration" *ngIf="step.duration">
+            <i class="fas fa-clock"></i> {{ step.duration }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Step Content -->
+      <div class="step-content">
+        <p class="step-description" [innerHTML]="step.description"></p>
+
+        <!-- Image -->
+        <figure class="step-image" *ngIf="step.imageUrl">
+          <img [src]="step.imageUrl" [alt]="step.title" loading="lazy">
+        </figure>
+
+        <!-- Video -->
+        <div class="step-video" *ngIf="step.videoUrl">
+          <video controls preload="metadata">
+            <source [src]="step.videoUrl" type="video/mp4">
+            Trình duyệt không hỗ trợ video.
+          </video>
+        </div>
+
+        <!-- Tip -->
+        <div class="step-tip" *ngIf="step.tip">
+          <i class="fas fa-lightbulb"></i>
+          <div>
+            <strong>Mẹo:</strong>
+            <span [innerHTML]="step.tip"></span>
+          </div>
+        </div>
+
+        <!-- Warning -->
+        <div class="step-warning" *ngIf="step.warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div>
+            <strong>Lưu ý:</strong>
+            <span [innerHTML]="step.warning"></span>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="step-links" *ngIf="step.links?.length">
+          <span class="links-label">Tham khảo:</span>
+          <a *ngFor="let link of step.links" 
+             [href]="link.url" 
+             target="_blank" 
+             rel="noopener"
+             class="step-link">
+            {{ link.label }}
+            <i class="fas fa-external-link-alt"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Completion Message -->
+  <div class="completion-message" *ngIf="progressPercent === 100">
+    <div class="completion-icon">
+      <i class="fas fa-trophy"></i>
+    </div>
+    <h2>Chúc mừng! 🎉</h2>
+    <p>Bạn đã hoàn thành hướng dẫn "{{ guide.title }}"</p>
+    <div class="completion-actions">
+      <button class="btn-primary" (click)="resetProgress()">
+        <i class="fas fa-redo"></i> Làm lại
+      </button>
+    </div>
+  </div>
+
+  <!-- Related Guides -->
+  <section class="related-guides" *ngIf="guide.relatedGuides?.length">
+    <h2><i class="fas fa-book"></i> Hướng dẫn liên quan</h2>
+    <div class="related-list">
+      <a *ngFor="let related of guide.relatedGuides"
+         [href]="related.url"
+         class="related-card">
+        <span class="related-title">{{ related.title }}</span>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Tags -->
+  <div class="guide-tags" *ngIf="guide.tags?.length">
+    <span class="tag" *ngFor="let tag of guide.tags">{{ tag }}</span>
+  </div>
+</article>
